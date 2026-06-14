@@ -134,6 +134,34 @@
   .callegend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin:6px 4px 0}
   .callegend span{display:flex;align-items:center;gap:5px}
   .callegend .lg{width:12px;height:12px;border-radius:4px;display:inline-block;background:color-mix(in srgb,var(--accent) 25%,var(--surface))}
+
+  /* prep edit mode (iOS-style) */
+  .titlebar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .btn-edit{background:none;border:0;color:var(--accent);font-family:inherit;font-size:16px;font-weight:600;
+    letter-spacing:-.01em;cursor:pointer;padding:8px 2px}
+  .btn-edit:active{opacity:.5}
+  .row .del{width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;border:0;flex:none;
+    display:none;align-items:center;justify-content:center;font-size:13px;font-weight:700;line-height:1;
+    cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .row .del:active{opacity:.6}
+  body.prepedit .row .del{display:flex}
+  .addrow{display:none;align-items:center;gap:13px;padding:13px 16px;position:relative}
+  .addrow::before{content:"";position:absolute;left:16px;right:0;top:0;height:1px;background:var(--line)}
+  body.prepedit .addrow{display:flex}
+  .addrow .plus{width:26px;height:26px;border-radius:50%;background:var(--green);color:#fff;border:0;flex:none;
+    display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;line-height:1;
+    cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .addrow .plus:active{opacity:.6}
+  .addrow input{flex:1;min-width:0;border:0;background:none;font-family:inherit;font-size:15px;font-weight:600;
+    letter-spacing:-.01em;color:var(--ink);padding:4px 0;outline:none}
+  .addrow input::placeholder{color:var(--faint);font-weight:500}
+  .savebar{display:none;margin:18px 0 4px}
+  body.prepedit .savebar{display:block}
+  .btn-save{width:100%;background:var(--accent);color:#fff;border:0;border-radius:14px;font-family:inherit;
+    font-size:16px;font-weight:600;letter-spacing:-.01em;padding:14px;cursor:pointer;box-shadow:var(--shadow)}
+  .btn-save:active{opacity:.85}
+  .savehint{font-size:12.5px;color:var(--faint);text-align:center;line-height:1.55;margin:10px 6px 0}
+  .savehint b{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -171,27 +199,30 @@
   <div class="note" style="padding:14px 4px 0">SE Asia fills in here as you book it — the co-pilot will add days automatically.</div>
 </section>
 
-<!-- TRAINS -->
+<!-- JOURNEY -->
 <section class="tab" id="tab-trains">
-  <div class="kicker">Tap a train when you've booked it</div>
-  <h1 class="largetitle">Trains</h1>
+  <div class="kicker">Flights + trains, in order · tap a train when booked</div>
+  <h1 class="largetitle">Journey</h1>
   <div class="group" id="trains"></div>
   <div class="note" style="padding:14px 4px 0">
-    Book on <b>Trip.com</b> (works without a VPN in China). Tickets release 15 days before travel.
+    Trains: book on <b>Trip.com</b> (works without a VPN in China). Tickets release 15 days before travel.
     <b>Your passport is the ticket</b> — use the staffed manual gate. Arrive 40–50 min early at mega-stations.
   </div>
 </section>
 
 <!-- MONEY -->
 <section class="tab" id="tab-money">
-  <div class="kicker">Tap a hotel when you've paid it</div>
-  <h1 class="largetitle">Money</h1>
-  <div class="grouphdr">Still to pay <span class="progress" id="payprog"></span></div>
+  <div class="kicker">Your solo pot · recomputes live, offline</div>
+  <h1 class="largetitle">Budget</h1>
+  <div id="budgetHero"></div>
+  <div class="grouphdr">Forecast to trip's end <span class="progress" id="fcstamp"></span></div>
+  <div class="group" id="forecast"></div>
+  <div class="grouphdr">Where it goes <span class="progress" id="catprog"></span></div>
+  <div class="group" id="bycat"></div>
+  <div class="grouphdr">Expenses <span class="progress" id="expprog"></span></div>
+  <div class="group" id="expenses"></div>
+  <div class="grouphdr">Still to pay · shared w/ Zak <span class="progress" id="payprog"></span></div>
   <div class="group" id="payments"></div>
-  <div class="grouphdr">Totals outstanding</div>
-  <div class="group" id="totals"></div>
-  <div class="grouphdr">Budget <span class="progress" id="budgetstamp"></span></div>
-  <div class="group" id="budget"></div>
   <div class="grouphdr">Currency converter <span class="progress" id="fxstamp"></span></div>
   <div class="group" id="fxbox"></div>
   <div class="grouphdr">How to pay</div>
@@ -206,13 +237,17 @@
 <!-- PREP -->
 <section class="tab" id="tab-prep">
   <div class="kicker">Saves as you tick · works offline</div>
-  <h1 class="largetitle">Prep</h1>
+  <div class="titlebar"><h1 class="largetitle">Prep</h1><button class="btn-edit" id="prepEdit" type="button">Edit</button></div>
   <div class="grouphdr">Before you fly <span class="progress" id="prepprog"></span></div>
   <div class="group" id="prep-before"></div>
   <div class="grouphdr">China setup · do before you arrive</div>
   <div class="group" id="prep-china"></div>
   <div class="grouphdr">Final 48 hours</div>
   <div class="group" id="prep-final"></div>
+  <div class="savebar">
+    <button class="btn-save" id="prepSave" type="button">Save list</button>
+    <div class="savehint" id="prepSaveHint">Edits save on this device as you make them. <b>Save list</b> exports prep-export.json for Claude to fold into the hub.</div>
+  </div>
 </section>
 
 <!-- SURVIVE -->
@@ -248,7 +283,7 @@
   <button data-tab="today" class="active"><span class="ic">🧭</span>Today</button>
   <button data-tab="trip"><span class="ic">🗺️</span>Trip</button>
   <button data-tab="calendar"><span class="ic">📅</span>Cal</button>
-  <button data-tab="trains"><span class="ic">🚄</span>Trains</button>
+  <button data-tab="trains"><span class="ic">✈️</span>Journey</button>
   <button data-tab="money"><span class="ic">💴</span>Money</button>
   <button data-tab="prep"><span class="ic">✅</span>Prep</button>
   <button data-tab="survive"><span class="ic">🆘</span>Survive</button>
@@ -290,6 +325,15 @@ const TRIP = {
     {id:6,from:"Shanghai",to:"Xiamen",departs:"2026-07-15",opens:"2026-07-01",fare:"¥430",dur:"~5 h",st:"上海虹桥 → 厦门北"},
     {id:7,from:"Xiamen",to:"Shenzhen",departs:"2026-07-16",opens:"2026-07-02",fare:"¥230",dur:"~3 h",st:"厦门北 → 深圳北"},
     {id:8,from:"Shenzhen",to:"Hong Kong",departs:"2026-07-18",opens:"2026-07-04",fare:"¥75",dur:"~15 min",st:"福田 → 香港西九龙"},
+  ],
+
+  flights:[
+    {date:"2026-06-23",from:"Wellington",to:"Sydney",fl:"QF162",dep:"06:05",who:"both",booked:true},
+    {date:"2026-06-23",from:"Sydney",to:"Tokyo (HND)",fl:"QF59",dep:"11:15",who:"both",booked:true},
+    {date:"2026-06-27",from:"Tokyo (NRT)",to:"Beijing (PEK)",fl:"IJ17",dep:"17:55",fare:"NZD 682",who:"both",booked:true},
+    {date:"2026-07-08",from:"Chengdu (TFU)",to:"Zhangjiajie (DYG)",fl:"CA2675",dep:"12:15",fare:"NZD 473 · 2 pax",who:"both",booked:true},
+    {date:"2026-07-21",from:"Hong Kong (HKG)",to:"home",fl:"QF128",who:"Zak",booked:true},
+    {date:"2026-07-22",from:"Hong Kong (HKG)",to:"onward · SE Asia",fl:"not booked",who:"Dylan solo",booked:false,flag:"BOOK"},
   ],
 
   deadlines:[ {label:"Beijing Sunworld — cancel or keep",date:"2026-06-25",sev:"high",action:"Cancel free, or pay 1 night (~NZD 170). Decision needed."} ],
@@ -362,10 +406,15 @@ const TRIP = {
 const LS="travelHQ.v1";
 let store=JSON.parse(localStorage.getItem(LS)||"{}");
 store.trains||={}; store.paid||={}; store.prep||={};
+store.prepAdd||={before:[],china:[],final:[]}; store.prepRem||={};
 const save=()=>localStorage.setItem(LS,JSON.stringify(store));
 const booked=id=>!!store.trains[id];
 const paid=city=>!!store.paid[city];
 const ticked=k=>!!store.prep[k];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+/* prep base revision: when Claude folds exported items into TRIP.prep he bumps TRIP.prepRev,
+   which clears the now-duplicate local add/remove deltas on next load (self-healing sync). */
+if((store.prepRev||0)!==(TRIP.prepRev||0)){store.prepAdd={before:[],china:[],final:[]};store.prepRem={};store.prepRev=(TRIP.prepRev||0);save();}
 
 /* ===================== ENGINE (runs every open, free) ===================== */
 const pd=s=>{const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
@@ -429,15 +478,29 @@ function renderCities(){
 }
 
 function renderTrains(){
-  trains.innerHTML=TRIP.trains.map(t=>{
-    const b=booked(t.id),o=days(today,t.opens);
-    const right=b?`<span class="badge b-green">booked</span>`
-      :o<=0?`<span class="badge b-red">book now</span>`:`<span class="badge b-grey">opens ${rel(o)}</span>`;
-    return `<div class="row tap${b?" done":""}" data-train="${t.id}">
-      <div class="chk${b?" on":""}">${tick}</div>
-      <div class="main"><div class="t">Train ${t.id} · ${t.from} → ${t.to}</div>
-        <div class="d">${fmt(t.departs)} · ${t.fare} pp · ${t.dur} · ${t.st}</div></div>
-      <div class="r">${right}</div></div>`;}).join("");
+  const legs=[];
+  TRIP.trains.forEach(t=>legs.push({k:"train",date:t.departs,t}));
+  (TRIP.flights||[]).forEach(f=>legs.push({k:"flight",date:f.date,f}));
+  legs.sort((a,b)=>pd(a.date)-pd(b.date));
+  trains.innerHTML=legs.map(L=>{
+    if(L.k==="train"){
+      const t=L.t,b=booked(t.id),o=days(today,t.opens);
+      const right=b?`<span class="badge b-green">booked</span>`
+        :o<=0?`<span class="badge b-red">book now</span>`:`<span class="badge b-grey">opens ${rel(o)}</span>`;
+      return `<div class="row tap${b?" done":""}" data-train="${t.id}">
+        <div class="chk${b?" on":""}">${tick}</div>
+        <div class="main"><div class="t">🚄 ${t.from} → ${t.to}</div>
+          <div class="d">${fmt(t.departs)} · ${t.fare} pp · ${t.dur} · ${t.st}</div></div>
+        <div class="r">${right}</div></div>`;
+    }
+    const f=L.f, who=f.who&&f.who!=="both"?` · ${f.who}`:"";
+    const right=f.booked?`<span class="badge b-green">booked</span>`:`<span class="badge b-red">${f.flag||"book"}</span>`;
+    return `<div class="row">
+      <div class="chk${f.booked?" on":""}" style="${f.booked?"background:var(--accent);border-color:var(--accent)":""}">${f.booked?tick:""}</div>
+      <div class="main"><div class="t">✈️ ${f.from} → ${f.to}${who}</div>
+        <div class="d">${fmt(f.date)}${f.dep?" · "+f.dep:""} · ${f.fl}${f.fare?" · "+f.fare:""}</div></div>
+      <div class="r">${right}</div></div>`;
+  }).join("");
 }
 
 function renderMoney(){
@@ -449,20 +512,52 @@ function renderMoney(){
       <div class="r"><span class="badge ${done?"b-green":"b-orange"}">${done?"paid":p.amt}</span></div></div>`;}).join("");
   const left=TRIP.payments.filter(p=>!paid(p.city)).length;
   document.getElementById("payprog").textContent=`${TRIP.payments.length-left}/${TRIP.payments.length} paid`;
-  document.getElementById("totals").innerHTML=TRIP.totals.map(t=>
-    `<div class="totrow${t.grand?" grand":""}"><span>${t.k}</span><span class="v">${t.v}</span></div>`).join("");
 }
 
+const PG=[{g:"before",k:"b",el:"prep-before"},{g:"china",k:"c",el:"prep-china"},{g:"final",k:"f",el:"prep-final"}];
 function renderPrep(){
-  const list=(arr,group)=>arr.map((txt,i)=>{const k=group+":"+i,on=ticked(k);
-    return `<div class="row tap${on?" done":""}" data-prep="${k}">
-      <div class="chk${on?" on":""}">${tick}</div><div class="main"><div class="t">${txt}</div></div></div>`;}).join("");
-  document.getElementById("prep-before").innerHTML=list(TRIP.prep.before,"b");
-  document.getElementById("prep-china").innerHTML=list(TRIP.prep.china,"c");
-  document.getElementById("prep-final").innerHTML=list(TRIP.prep.final,"f");
-  const all=TRIP.prep.before.length+TRIP.prep.china.length+TRIP.prep.final.length;
-  const done=Object.values(store.prep).filter(Boolean).length;
+  let all=0,done=0;
+  PG.forEach(({g,k,el})=>{
+    const base=TRIP.prep[g].map((txt,i)=>({txt,tk:k+":"+i,rk:g+":"+i,base:1}))
+                           .filter(o=>!store.prepRem[o.rk]);
+    const add=(store.prepAdd[g]||[]).map((txt,i)=>({txt,tk:k+"a:"+i,ai:i}));
+    const items=base.concat(add);
+    document.getElementById(el).innerHTML=items.map(o=>{
+      const on=ticked(o.tk);
+      const del=o.base?`data-prepdel="${o.rk}"`:`data-prepdela="${g}:${o.ai}"`;
+      return `<div class="row tap${on?" done":""}" data-prep="${o.tk}">
+        <div class="chk${on?" on":""}">${tick}</div>
+        <div class="main"><div class="t">${esc(o.txt)}</div></div>
+        <button class="del" type="button" ${del} aria-label="Remove item">✕</button></div>`;
+    }).join("")
+      +`<div class="addrow"><button class="plus" type="button" data-prepaddbtn="${g}" aria-label="Add item">＋</button>`
+      +`<input type="text" data-prepadd="${g}" placeholder="Add item" enterkeyhint="done" autocomplete="off"></div>`;
+    all+=items.length; items.forEach(o=>{if(ticked(o.tk))done++;});
+  });
   document.getElementById("prepprog").textContent=`${done}/${all} done`;
+}
+function setPrepEdit(on){
+  document.body.classList.toggle("prepedit",on);
+  const b=document.getElementById("prepEdit"); if(b)b.textContent=on?"Done":"Edit";
+}
+function prepAddCommit(inp){
+  if(!inp)return; const g=inp.dataset.prepadd,v=inp.value.trim(); if(!v)return;
+  (store.prepAdd[g]||(store.prepAdd[g]=[])).push(v); save(); renderPrep();
+  const ni=document.querySelector(`[data-prepadd="${g}"]`); if(ni)ni.focus();
+}
+function prepSaveList(){
+  const prep={};
+  PG.forEach(({g})=>{prep[g]=TRIP.prep[g].filter((_,i)=>!store.prepRem[g+":"+i]).concat(store.prepAdd[g]||[]);});
+  const payload={
+    _readme:"Prep list exported from Travel HQ. Claude: set TRIP.prep to `prep` and TRIP.prepRev to `prepRev` in travel-hq.html, then re-sync the public hub. The bumped prepRev clears this device's local edits automatically.",
+    generated:new Date().toISOString(), prepRev:(TRIP.prepRev||0)+1, prep
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url; a.download="prep-export.json"; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+  const h=document.getElementById("prepSaveHint");
+  if(h)h.innerHTML="Saved <b>prep-export.json</b> to your Downloads — tell Claude “sync my prep list”.";
 }
 
 function renderStatic(){
@@ -477,12 +572,23 @@ renderStatic();renderAll();
 
 /* ===================== INTERACTIONS ===================== */
 document.body.addEventListener("click",e=>{
+  if(e.target.closest("#prepEdit")){setPrepEdit(!document.body.classList.contains("prepedit"));return;}
+  if(e.target.closest("#prepSave")){prepSaveList();return;}
+  const del=e.target.closest("[data-prepdel]");
+  if(del){store.prepRem[del.dataset.prepdel]=true;save();renderPrep();return;}
+  const dela=e.target.closest("[data-prepdela]");
+  if(dela){const[g,i]=dela.dataset.prepdela.split(":");(store.prepAdd[g]||[]).splice(+i,1);save();renderPrep();return;}
+  const addb=e.target.closest("[data-prepaddbtn]");
+  if(addb){prepAddCommit(addb.parentElement.querySelector("[data-prepadd]"));return;}
   const tr=e.target.closest("[data-train]");
   const pay=e.target.closest("[data-pay]");
   const pr=e.target.closest("[data-prep]");
   if(tr){const id=tr.dataset.train;store.trains[id]=!store.trains[id];save();renderTrains();renderToday();}
   else if(pay){const c=pay.dataset.pay;store.paid[c]=!store.paid[c];save();renderMoney();renderCities();renderToday();}
-  else if(pr){const k=pr.dataset.prep;store.prep[k]=!store.prep[k];save();renderPrep();}
+  else if(pr){if(document.body.classList.contains("prepedit"))return;const k=pr.dataset.prep;store.prep[k]=!store.prep[k];save();renderPrep();}
+});
+document.body.addEventListener("keydown",e=>{
+  if(e.key==="Enter"){const inp=e.target.closest("[data-prepadd]");if(inp){e.preventDefault();prepAddCommit(inp);}}
 });
 
 document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",()=>{
@@ -490,28 +596,130 @@ document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",
   document.querySelectorAll("section.tab").forEach(x=>x.classList.remove("active"));
   b.classList.add("active");
   document.getElementById("tab-"+b.dataset.tab).classList.add("active");
+  setPrepEdit(false);
   window.scrollTo({top:0,behavior:"smooth"});
 }));
 </script>
 
 <script>
-/* ===== Budget & currency — reuses TRIP / store / save / fmt from the script above ===== */
+/* ===== Budget & forecast engine — your solo NZD pot. Reuses TRIP/store/save/fmt/pd/today/days. Recomputes live, offline. ===== */
 (function(){
   TRIP.fx={date:"2026-06-14",base:"NZD",
     rates:{NZD:1,CNY:0.253,HKD:0.078,JPY:0.0108,USD:0.61,SGD:0.45,THB:0.052,MYR:0.13,VND:0.000024,IDR:0.000038}};
-  TRIP.spend=TRIP.spend||[];        /* co-pilot appends {date,city,cur,amt,what} from receipts */
-  TRIP.outstanding=2650;            /* ~NZD (hotels + trains) */
+
+  /* ---- THE PLAN (file-editable; co-pilot keeps daily rates + FX honest) ---- */
+  const PLAN={
+    pot:16000, endEst:"2026-10-31", emergency:1000,
+    committed:[
+      {what:"China accom — my ~50% share", amt:690, cat:"Accommodation"},
+      {what:"T8 Shenzhen → HK train", amt:20, cat:"Transport"},
+      {what:"Onward flight ex-HK · Jul 22", amt:350, cat:"Transport", est:1},
+      {what:"Flight home reserve", amt:1600, cat:"Transport", est:1},
+    ],
+    stages:[
+      {region:"China + Japan · daily living", days:30, daily:55},
+      {region:"Indonesia · Bali + Java", days:21, daily:70},
+      {region:"Thailand", days:30, daily:75},
+      {region:"Vietnam", days:25, daily:65},
+      {region:"Cambodia", days:14, daily:65},
+      {region:"Laos", days:10, daily:60},
+    ],
+    cats:[
+      {k:"Accommodation",t:3500},{k:"Food & Drinks",t:2500},{k:"Transport",t:1500},
+      {k:"Activities",t:1800},{k:"Shopping",t:600},{k:"Misc",t:600},{k:"Emergency Buffer",t:1000},
+    ],
+  };
+  TRIP.spend=TRIP.spend||[];              // co-pilot appends {date,city,cur,amt,what,cat}
+  store.localSpend=store.localSpend||[];  // your taps
+  store.bud=store.bud||{}; store.bud.stages=store.bud.stages||{};  // your overrides
+  const G=k=>store.bud[k]!==undefined?store.bud[k]:PLAN[k];
+
   const CUR=["NZD","CNY","HKD","JPY","USD","SGD","THB","MYR","VND","IDR"];
   const sym={NZD:"NZ$",CNY:"¥CNY",HKD:"HK$",JPY:"¥JPY",USD:"US$",SGD:"S$",THB:"฿THB",MYR:"RM",VND:"₫VND",IDR:"Rp"};
-  store.localSpend=store.localSpend||[];
-  let fx={amt:100,from:"CNY",to:"NZD"}, adding=false;
+  const CATS=PLAN.cats.map(c=>c.k);
   const r=TRIP.fx.rates;
   const toNZD=(a,c)=>a*(r[c]||0);
   const conv=(a,f,t)=>a*(r[f]||0)/(r[t]||1);
-  const money=n=>(isFinite(n)?n:0).toLocaleString("en-NZ",{maximumFractionDigits:2});
+  const money=n=>(isFinite(n)?n:0).toLocaleString("en-NZ",{maximumFractionDigits:0});
+  const money2=n=>(isFinite(n)?n:0).toLocaleString("en-NZ",{maximumFractionDigits:2});
   const $=id=>document.getElementById(id);
   const inp="font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--surface2);color:var(--ink)";
+  let fx={amt:100,from:"CNY",to:"NZD"}, adding=false;
 
+  const allSpend=()=>[...TRIP.spend,...store.localSpend];
+  const spentNZD=()=>allSpend().reduce((s,e)=>s+toNZD(e.amt,e.cur),0);
+  const stageVal=s=>{const o=store.bud.stages[s.region]||{};return {days:o.days??s.days,daily:o.daily??s.daily};};
+  const forecastDaily=()=>PLAN.stages.reduce((s,x)=>{const v=stageVal(x);return s+v.days*v.daily;},0);
+  const committedTotal=()=>PLAN.committed.reduce((s,x)=>s+x.amt,0);
+
+  /* ---- 1. the 5 numbers + verdict ---- */
+  function renderHero(){
+    const pot=G("pot"),emrg=G("emergency"),spent=spentNZD(),comm=committedTotal();
+    const remaining=pot-spent-comm-emrg;
+    const fcast=remaining-forecastDaily();
+    const dleft=Math.max(1,days(today,G("endEst")));
+    const safe=remaining/dleft, ok=fcast>=0;
+    $("budgetHero").innerHTML=
+      `<div class="hero" style="margin-bottom:10px">
+         <div class="big" style="color:${ok?"var(--green)":"var(--red)"}">NZ$ ${money(fcast)}</div>
+         <div class="where">${ok?"projected surplus at trip's end":"projected shortfall — trim days or rates"} · safe ≈ <b>NZ$ ${money(safe)}/day</b> for ${dleft} days</div>
+       </div>
+       <div class="group">
+         <div class="totrow"><span>Pot</span><span class="v" id="potRow" style="cursor:pointer">NZ$ ${money(pot)} ✎</span></div>
+         <div class="totrow"><span>− Spent so far</span><span class="v">NZ$ ${money(spent)}</span></div>
+         <div class="totrow"><span>− Committed · unpaid</span><span class="v">NZ$ ${money(comm)}</span></div>
+         <div class="totrow"><span>− Emergency reserve · protected</span><span class="v" id="emRow" style="cursor:pointer">NZ$ ${money(emrg)} ✎</span></div>
+         <div class="totrow grand"><span>= Remaining to live on</span><span class="v">NZ$ ${money(remaining)}</span></div>
+       </div>`;
+  }
+
+  /* ---- 2. forecast stages, tap to edit ---- */
+  function renderForecast(){
+    const rows=PLAN.stages.map((s,i)=>{const v=stageVal(s);
+      return `<div class="row tap" data-stage="${i}"><div class="main"><div class="t">${s.region}</div>
+        <div class="d">${v.days} days × NZ$ ${v.daily}/day</div></div>
+        <div class="r">NZ$ ${money(v.days*v.daily)}</div></div>`;}).join("");
+    $("forecast").innerHTML=rows+
+      `<div class="totrow grand"><span>Forecast spend · rest of trip</span><span class="v">NZ$ ${money(forecastDaily())}</span></div>
+       <div class="note" style="padding:10px 16px">Tap a stage to adjust its days or daily rate. The co-pilot tunes these from what you actually spend.</div>`;
+    $("fcstamp").textContent=PLAN.stages.reduce((s,x)=>s+stageVal(x).days,0)+" days planned";
+  }
+
+  /* ---- 3. by category: logged spend vs target ---- */
+  function renderCats(){
+    const byCat={}; CATS.forEach(k=>byCat[k]=0);
+    allSpend().forEach(e=>{const c=CATS.includes(e.cat)?e.cat:"Misc";byCat[c]+=toNZD(e.amt,e.cur);});
+    $("bycat").innerHTML=PLAN.cats.map(c=>{
+      const sp=byCat[c.k]||0,pct=Math.min(100,Math.round(sp/c.t*100)),over=sp>c.t;
+      return `<div class="row"><div class="main"><div class="t">${c.k}</div>
+        <div style="height:6px;border-radius:6px;background:var(--surface2);margin-top:6px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${over?"var(--red)":"var(--accent)"}"></div></div></div>
+        <div class="r">NZ$ ${money(sp)} <span style="color:var(--faint)">/ ${money(c.t)}</span></div></div>`;}).join("");
+    $("catprog").textContent="spent vs target";
+  }
+
+  /* ---- 4. expenses: add + recent ---- */
+  function renderExp(){
+    const recent=allSpend().slice(-8).reverse();
+    let h= adding
+      ? `<div class="row" style="gap:8px;flex-wrap:wrap;align-items:center">
+           <input id="eAmt" type="number" inputmode="decimal" placeholder="amount" style="${inp};width:88px">
+           <select id="eCur" style="${inp}">${CUR.map(x=>`<option${x==="CNY"?" selected":""}>${x}</option>`).join("")}</select>
+           <select id="eCat" style="${inp}">${CATS.map(x=>`<option>${x}</option>`).join("")}</select>
+           <input id="eWhat" placeholder="what for" style="${inp};flex:1;min-width:90px">
+           <button id="eSave" style="${inp};background:var(--accent);color:#fff;border:none;font-weight:700;cursor:pointer">Save</button>
+           <button id="eCancel" style="${inp};cursor:pointer">✕</button>
+         </div>`
+      : `<div class="row tap" id="addExp"><div class="main"><div class="t" style="color:var(--accent)">＋ Add an expense</div><div class="d">saved on this device · or the co-pilot logs it from receipts</div></div></div>`;
+    if(!recent.length) h+=`<div class="empty">No spending logged yet — the pot is whole.</div>`;
+    recent.forEach(e=>{h+=`<div class="row"><div class="main"><div class="t">${e.what||e.cat||"Spend"}</div>
+      <div class="d">${e.cat?e.cat+" · ":""}${e.city?e.city+" · ":""}${e.cur} ${e.amt}</div></div>
+      <div class="r">NZ$ ${money2(toNZD(e.amt,e.cur))}</div></div>`;});
+    $("expenses").innerHTML=h;
+    $("expprog").textContent=`${allSpend().length} logged · NZ$ ${money(spentNZD())}`;
+  }
+
+  /* ---- FX converter (kept) ---- */
   function renderFx(){
     const opts=c=>CUR.map(x=>`<option value="${x}"${x===c?" selected":""}>${sym[x]}</option>`).join("");
     $("fxstamp").textContent="rates "+fmt(TRIP.fx.date);
@@ -523,79 +731,115 @@ document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",
          <select id="fxTo" style="${inp}">${opts(fx.to)}</select>
          <div class="t" id="fxRes" style="margin-left:auto;font-size:19px;font-weight:800"></div>
        </div>
-       <div class="note" style="padding:8px 16px 14px">¥1 CNY ≈ NZ$${r.CNY} · HK$1 ≈ NZ$${r.HKD} · ¥1 JPY ≈ NZ$${r.JPY} — the co-pilot refreshes these each morning.</div>`;
+       <div class="note" style="padding:8px 16px 14px">¥1 CNY ≈ NZ$${r.CNY} · HK$1 ≈ NZ$${r.HKD} · ¥1 JPY ≈ NZ$${r.JPY} — refreshed each morning by the co-pilot.</div>`;
     updFx();
   }
-  function updFx(){ const e=$("fxRes"); if(e) e.textContent=sym[fx.to]+" "+money(conv(fx.amt,fx.from,fx.to)); }
+  function updFx(){const e=$("fxRes");if(e)e.textContent=sym[fx.to]+" "+money2(conv(fx.amt,fx.from,fx.to));}
 
-  function spent(){ return [...TRIP.spend,...store.localSpend].reduce((s,e)=>s+toNZD(e.amt,e.cur),0); }
-  function renderBudget(){
-    const s=spent(), planned=store.budget||null, recent=[...TRIP.spend,...store.localSpend].slice(-6).reverse();
-    let h=`<div class="totrow"><span>Spent so far</span><span class="v">NZ$ ${money(s)}</span></div>
-           <div class="totrow"><span>Still outstanding</span><span class="v">~NZ$ ${TRIP.outstanding.toLocaleString("en-NZ")}</span></div>`;
-    h+= planned
-      ? `<div class="totrow grand"><span>Left of budget</span><span class="v">NZ$ ${money(planned-s-TRIP.outstanding)}</span></div>`
-      : `<div class="row tap" id="setBud"><div class="main"><div class="t" style="color:var(--accent)">Set a trip budget</div><div class="d">optional — track what's left</div></div></div>`;
-    h+= adding
-      ? `<div class="row" style="gap:8px;flex-wrap:wrap;align-items:center">
-           <input id="eAmt" type="number" inputmode="decimal" placeholder="amount" style="${inp};width:92px">
-           <select id="eCur" style="${inp}">${CUR.map(x=>`<option${x==="CNY"?" selected":""}>${x}</option>`).join("")}</select>
-           <input id="eWhat" placeholder="what for" style="${inp};flex:1;min-width:100px">
-           <button id="eSave" style="${inp};background:var(--accent);color:#fff;border:none;font-weight:700;cursor:pointer">Save</button>
-           <button id="eCancel" style="${inp};cursor:pointer">✕</button>
-         </div>`
-      : `<div class="row tap" id="addExp"><div class="main"><div class="t" style="color:var(--accent)">＋ Add an expense</div><div class="d">saved on this device · or the co-pilot logs it from receipts</div></div></div>`;
-    recent.forEach(e=>{ h+=`<div class="row"><div class="main"><div class="t">${e.what||e.city||"Spend"}</div><div class="d">${e.city?e.city+" · ":""}${e.cur} ${e.amt}</div></div><div class="r">NZ$ ${money(toNZD(e.amt,e.cur))}</div></div>`; });
-    $("budget").innerHTML=h;
-  }
+  function renderBudget(){renderHero();renderForecast();renderCats();renderExp();}
 
-  document.body.addEventListener("input",e=>{ if(e.target.id==="fxAmt"){fx.amt=parseFloat(e.target.value)||0;updFx();} });
+  /* ---- interactions ---- */
+  document.body.addEventListener("input",e=>{if(e.target.id==="fxAmt"){fx.amt=parseFloat(e.target.value)||0;updFx();}});
   document.body.addEventListener("change",e=>{
     if(e.target.id==="fxFrom"){fx.from=e.target.value;updFx();}
     else if(e.target.id==="fxTo"){fx.to=e.target.value;updFx();}
   });
   document.body.addEventListener("click",e=>{
-    if(e.target.closest("#addExp")){adding=true;renderBudget();}
-    else if(e.target.closest("#eCancel")){adding=false;renderBudget();}
+    if(e.target.closest("#addExp")){adding=true;renderExp();}
+    else if(e.target.closest("#eCancel")){adding=false;renderExp();}
     else if(e.target.closest("#eSave")){
       const a=parseFloat($("eAmt").value);
-      if(a>0)store.localSpend.push({date:new Date().toISOString().slice(0,10),cur:$("eCur").value,amt:a,what:($("eWhat").value||"Spend")});
-      save(); adding=false; renderBudget();
+      if(a>0)store.localSpend.push({date:new Date().toISOString().slice(0,10),cur:$("eCur").value,amt:a,cat:$("eCat").value,what:($("eWhat").value||"Spend")});
+      save();adding=false;renderBudget();
     }
-    else if(e.target.closest("#setBud")){ const v=parseFloat(prompt("Trip budget in NZD?")||""); if(v>0){store.budget=v;save();renderBudget();} }
+    else if(e.target.id==="potRow"){const v=parseFloat(prompt("Trip pot in NZD?",G("pot"))||"");if(v>0){store.bud.pot=v;save();renderBudget();}}
+    else if(e.target.id==="emRow"){const v=parseFloat(prompt("Emergency reserve in NZD (protected)?",G("emergency"))||"");if(v>=0){store.bud.emergency=v;save();renderBudget();}}
+    else{const st=e.target.closest("[data-stage]");if(st){const s=PLAN.stages[+st.dataset.stage],v=stageVal(s);
+      const d=parseFloat(prompt(`Days in ${s.region}?`,v.days)||"");const rate=parseFloat(prompt(`Daily NZD in ${s.region}?`,v.daily)||"");
+      const o=store.bud.stages[s.region]||{};if(d>=0)o.days=d;if(rate>=0)o.daily=rate;store.bud.stages[s.region]=o;save();renderBudget();}}
   });
 
-  renderFx(); renderBudget();
+  renderFx();renderBudget();
 })();
 </script>
 
 <script>
-/* ===== Calendar — reuses TRIP / pd / today / fmt from above ===== */
+/* ===== Calendar — events-aware, month/week toggle, tap a day for detail. Reuses TRIP/pd/today. ===== */
 (function(){
   const cont=document.getElementById("cal"); if(!cont) return;
-  const t=v=>pd(v).getTime();
+  const key=dt=>dt.getFullYear()+"-"+dt.getMonth()+"-"+dt.getDate();
   const cityOn=d=>TRIP.cities.find(c=>d>=pd(c.in)&&d<pd(c.out));
-  const months=[{y:2026,m:5,label:"June 2026"},{y:2026,m:6,label:"July 2026"}];
-  const dow=["S","M","T","W","T","F","S"]; let html="";
-  months.forEach(mo=>{
-    const startDow=new Date(mo.y,mo.m,1).getDay(), daysIn=new Date(mo.y,mo.m+1,0).getDate();
-    html+=`<div class="calmonth"><div class="calhdr">${mo.label}</div><div class="calgrid">`;
-    dow.forEach(d=>html+=`<div class="caldow">${d}</div>`);
-    for(let i=0;i<startDow;i++) html+=`<div></div>`;
+  const dow=["S","M","T","W","T","F","S"];
+  const acts=[{date:"2026-06-25",what:"teamLab Planets · 11:30 Tokyo"}];
+  function startOfWeek(d){const x=new Date(d);x.setDate(x.getDate()-x.getDay());return x;}
+
+  /* event map: date-key -> [{label,color}] */
+  const ev={};
+  const add=(ds,label,color)=>{const k=key(pd(ds));(ev[k]=ev[k]||[]).push({label,color});};
+  TRIP.cities.forEach(c=>add(c.in,"📍 Arrive "+c.nm,"var(--green)"));
+  TRIP.trains.forEach(t=>{add(t.departs,"🚄 "+t.from+" → "+t.to,"var(--orange)");add(t.opens,"🎫 Train "+t.id+" books open","var(--orange)");});
+  (TRIP.flights||[]).forEach(f=>add(f.date,"✈️ "+f.from+" → "+f.to,"var(--accent)"));
+  TRIP.deadlines.forEach(d=>add(d.date,"⏰ "+d.label,"var(--red)"));
+  acts.forEach(a=>add(a.date,"🎟️ "+a.what,"var(--green)"));
+
+  let view="month", wkStart=startOfWeek(today<pd(TRIP.departure)?pd(TRIP.departure):today);
+  const months=[{y:2026,m:5,label:"June 2026"},{y:2026,m:6,label:"July 2026"},{y:2026,m:7,label:"August 2026 · SE Asia begins"}];
+  const navbtn="font:inherit;font-weight:700;padding:5px 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--accent);cursor:pointer";
+  const seg=on=>`font:inherit;font-weight:700;padding:7px 16px;border:1px solid var(--line);border-radius:980px;cursor:pointer;background:${on?"var(--accent)":"var(--surface)"};color:${on?"#fff":"var(--ink)"}`;
+
+  function monthHTML(mo){
+    const startDow=new Date(mo.y,mo.m,1).getDay(),daysIn=new Date(mo.y,mo.m+1,0).getDate();
+    let h=`<div class="calmonth"><div class="calhdr">${mo.label}</div><div class="calgrid">`;
+    dow.forEach(d=>h+=`<div class="caldow">${d}</div>`);
+    for(let i=0;i<startDow;i++)h+=`<div></div>`;
     for(let day=1;day<=daysIn;day++){
-      const dt=new Date(mo.y,mo.m,day), tm=dt.getTime(), c=cityOn(dt);
-      let cls="calday"; if(c) cls+=" trip"; if(tm===today.getTime()) cls+=" today";
-      let dots="";
-      if(TRIP.trains.some(x=>t(x.opens)===tm)) dots+=`<span class="cdot train"></span>`;
-      if(TRIP.deadlines.some(x=>t(x.date)===tm)) dots+=`<span class="cdot dl"></span>`;
-      if(tm===t(TRIP.departure)) dots+=`<span class="cdot dep"></span>`;
+      const dt=new Date(mo.y,mo.m,day),k=key(dt),es=ev[k]||[],c=cityOn(dt);
+      let cls="calday";if(c)cls+=" trip";if(k===key(today))cls+=" today";
+      const dots=es.slice(0,4).map(x=>`<span class="cdot" style="background:${x.color}"></span>`).join("");
       const nm=c?c.nm.split(" ")[0].slice(0,4):"";
-      html+=`<div class="${cls}"><div class="cnum">${day}</div><div class="cnm">${nm}</div><div class="cdots">${dots}</div></div>`;
+      h+=`<div class="${cls}" data-cal="${k}" style="cursor:pointer"><div class="cnum">${day}</div><div class="cnm">${nm}</div><div class="cdots">${dots}</div></div>`;
     }
-    html+=`</div></div>`;
+    return h+`</div></div>`;
+  }
+  function weekHTML(){
+    let h=`<div class="calmonth"><div class="calhdr" style="display:flex;align-items:center;gap:10px">
+      <button data-wk="-1" style="${navbtn}">‹</button>
+      <span style="flex:1;text-align:center">Week of ${wkStart.toLocaleDateString("en-NZ",{day:"numeric",month:"short"})}</span>
+      <button data-wk="0" style="${navbtn}">Today</button>
+      <button data-wk="1" style="${navbtn}">›</button></div><div class="group">`;
+    for(let i=0;i<7;i++){
+      const dt=new Date(wkStart);dt.setDate(dt.getDate()+i);const k=key(dt),es=ev[k]||[],c=cityOn(dt),isT=k===key(today);
+      h+=`<div class="row tap" data-cal="${k}">
+        <div class="main"><div class="t">${dt.toLocaleDateString("en-NZ",{weekday:"short",day:"numeric",month:"short"})}${isT?' <span class="badge b-blue">today</span>':""}</div>
+          <div class="d">${c?"📍 "+c.nm+" · ":""}${es.length?es.map(e=>e.label).join(" · "):"—"}</div></div></div>`;
+    }
+    return h+`</div></div>`;
+  }
+  function showDay(k){
+    const es=ev[k]||[],p=k.split("-").map(Number),dt=new Date(p[0],p[1],p[2]),c=cityOn(dt);
+    let h=`<div class="calhdr" style="margin-top:10px">${dt.toLocaleDateString("en-NZ",{weekday:"long",day:"numeric",month:"long"})}</div>`;
+    if(c)h+=`<div class="note" style="padding:2px 4px 8px">In ${c.nm} · ${c.hotel}</div>`;
+    h+= es.length?`<div class="group">`+es.map(x=>`<div class="row"><div class="main"><div class="t" style="font-weight:600">${x.label}</div></div></div>`).join("")+`</div>`
+       :`<div class="empty">Nothing scheduled — a free day.</div>`;
+    document.getElementById("calDetail").innerHTML=h;
+  }
+  function render(){
+    let h=`<div style="display:flex;gap:8px;margin:2px 4px 14px">
+      <button data-view="month" style="${seg(view==="month")}">Month</button>
+      <button data-view="week" style="${seg(view==="week")}">Week</button></div>`;
+    h+=`<div id="calBody">`+(view==="month"?months.map(monthHTML).join(""):weekHTML())+`</div>`;
+    h+=`<div class="callegend"><span><span class="lg"></span>in a city</span><span><span class="cdot" style="background:var(--accent)"></span>flight</span><span><span class="cdot train"></span>train</span><span><span class="cdot" style="background:var(--green)"></span>arrive/activity</span><span><span class="cdot dl"></span>deadline</span></div>`;
+    h+=`<div id="calDetail"></div>`;
+    cont.innerHTML=h;
+    showDay(key(today));
+  }
+  cont.addEventListener("click",e=>{
+    const v=e.target.closest("[data-view]"),w=e.target.closest("[data-wk]"),d=e.target.closest("[data-cal]");
+    if(v){view=v.dataset.view;render();}
+    else if(w){const n=+w.dataset.wk;if(n===0)wkStart=startOfWeek(today);else wkStart.setDate(wkStart.getDate()+n*7);render();}
+    else if(d){showDay(d.dataset.cal);document.getElementById("calDetail").scrollIntoView({behavior:"smooth",block:"nearest"});}
   });
-  html+=`<div class="callegend"><span><span class="lg"></span>in a city</span><span><span class="cdot dep"></span>fly out</span><span><span class="cdot train"></span>train opens</span><span><span class="cdot dl"></span>deadline</span></div>`;
-  cont.innerHTML=html;
+  render();
 })();
 </script>
 </body>
