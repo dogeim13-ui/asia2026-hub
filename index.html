@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<title>Travel HQ · Asia 2026</title>
+<style>
+  :root{
+    --bg:#f5f5f7; --surface:#ffffff; --surface2:#fbfbfd;
+    --ink:#1d1d1f; --muted:#6e6e73; --faint:#86868b; --line:#e3e3e6;
+    --accent:#0071e3; --green:#34c759; --red:#ff3b30; --orange:#ff9500;
+    --shadow:0 1px 3px rgba(0,0,0,.07), 0 8px 24px rgba(0,0,0,.05);
+    --tabbar:rgba(255,255,255,.8);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#000000; --surface:#1c1c1e; --surface2:#2c2c2e;
+      --ink:#f5f5f7; --muted:#aeaeb2; --faint:#8e8e93; --line:#38383a;
+      --accent:#0a84ff; --green:#30d158; --red:#ff453a; --orange:#ff9f0a;
+      --shadow:0 1px 3px rgba(0,0,0,.5); --tabbar:rgba(28,28,30,.78);
+    }
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  body{max-width:720px;margin:0 auto;padding:0 18px calc(94px + env(safe-area-inset-bottom));}
+  a{color:var(--accent);text-decoration:none}
+  h1,h2,h3{margin:0}
+
+  .kicker{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);
+    padding-top:26px}
+  .largetitle{font-size:32px;font-weight:800;letter-spacing:-.022em;margin:2px 0 14px}
+  .grouphdr{font-size:13px;font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.03em;
+    margin:24px 4px 8px}
+
+  /* Countdown hero */
+  .hero{background:var(--surface);border-radius:20px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:12px}
+  .hero .big{font-size:30px;font-weight:800;letter-spacing:-.02em}
+  .hero .big b{color:var(--accent)}
+  .hero .where{font-size:14px;color:var(--muted);margin-top:3px}
+
+  /* Co-pilot card */
+  .copilot{background:linear-gradient(135deg,#0a84ff 0%,#0071e3 100%);color:#fff;
+    border-radius:20px;padding:16px 18px;box-shadow:0 8px 24px rgba(0,113,227,.28);margin-bottom:6px}
+  .copilot .lab{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+  .copilot p{margin:7px 0 0;font-size:15px;line-height:1.5;font-weight:500}
+  .copilot .stamp{font-size:12px;opacity:.8;margin-top:9px}
+
+  /* Grouped card list (iOS inset grouped) */
+  .group{background:var(--surface);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  .row{display:flex;align-items:center;gap:13px;padding:13px 16px;position:relative}
+  .row + .row::before{content:"";position:absolute;left:16px;right:0;top:0;height:1px;background:var(--line)}
+  .row .main{flex:1;min-width:0}
+  .row .t{font-size:15px;font-weight:600;letter-spacing:-.01em}
+  .row .d{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.4}
+  .row .r{margin-left:auto;text-align:right;flex:none;font-size:13px}
+  .tap{cursor:pointer;transition:background .15s} .tap:active{background:var(--surface2)}
+
+  /* iOS check circle */
+  .chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);flex:none;
+    display:flex;align-items:center;justify-content:center;transition:all .18s}
+  .chk svg{width:15px;height:15px;opacity:0;transform:scale(.5);transition:all .18s}
+  .chk.on{background:var(--green);border-color:var(--green)}
+  .chk.on svg{opacity:1;transform:scale(1)} .chk.on svg path{stroke:#fff}
+  .done .t{color:var(--faint);text-decoration:line-through}
+
+  /* badges */
+  .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:980px;white-space:nowrap}
+  .b-red{color:#fff;background:var(--red)} .b-green{color:#fff;background:var(--green)}
+  .b-orange{color:#fff;background:var(--orange)} .b-grey{color:var(--muted);background:var(--surface2);border:1px solid var(--line)}
+  .b-blue{color:#fff;background:var(--accent)}
+
+  /* urgent items (Today) */
+  .urgent{padding:14px 16px;position:relative}
+  .urgent + .urgent::before{content:"";position:absolute;left:16px;right:0;top:0;height:1px;background:var(--line)}
+  .urgent .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .urgent .t{font-size:15px;font-weight:700;letter-spacing:-.01em}
+  .urgent .when{font-size:13px;font-weight:700;flex:none}
+  .urgent.now .when{color:var(--red)} .urgent.soon .when{color:var(--orange)}
+  .urgent .d{font-size:13.5px;color:var(--muted);margin-top:3px;line-height:1.45}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle}
+  .empty{padding:18px 16px;color:var(--muted);font-size:14px;text-align:center}
+
+  /* city cards */
+  .city{position:relative;border-radius:18px;overflow:hidden;margin-bottom:11px;min-height:138px;
+    display:flex;align-items:flex-end;background:#222;box-shadow:var(--shadow)}
+  .city img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .city .grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.82),rgba(0,0,0,.05) 65%,rgba(0,0,0,.35))}
+  .city .body{position:relative;padding:14px 16px;width:100%;color:#fff}
+  .city .nm{font-size:20px;font-weight:800;letter-spacing:-.01em}
+  .city .cc{font-size:13px;font-weight:600;opacity:.85;margin-left:5px}
+  .city .meta{font-size:13px;opacity:.92;margin-top:3px}
+  .city .hot{font-size:12.5px;opacity:.8;margin-top:2px}
+  .city.current{outline:3px solid var(--accent);outline-offset:-3px}
+  .city .tr{position:absolute;top:12px;right:12px}
+
+  .note{padding:15px 17px;font-size:13.5px;color:var(--muted);line-height:1.55}
+  .note b{color:var(--ink)} .note p{margin:0 0 9px} .note p:last-child{margin:0}
+  .cn{font-size:14.5px;color:var(--ink);font-weight:600} .addr{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .totrow{display:flex;justify-content:space-between;padding:13px 16px;font-size:14.5px;position:relative}
+  .totrow + .totrow::before{content:"";position:absolute;left:16px;right:0;top:0;height:1px;background:var(--line)}
+  .totrow.grand{font-weight:800} .totrow .v{font-weight:600}
+  .progress{font-size:13px;color:var(--faint);font-weight:600;margin-left:auto}
+
+  /* bottom tab bar */
+  nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:space-around;
+    background:var(--tabbar);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+    border-top:1px solid var(--line);padding:7px 4px calc(7px + env(safe-area-inset-bottom))}
+  nav.tabs button{background:none;border:0;color:var(--faint);font-family:inherit;font-size:10.5px;font-weight:600;
+    display:flex;flex-direction:column;align-items:center;gap:3px;padding:3px 6px;cursor:pointer;flex:1;letter-spacing:.01em}
+  nav.tabs button .ic{font-size:21px;line-height:1;filter:grayscale(1);opacity:.6;transition:all .15s}
+  nav.tabs button.active{color:var(--accent)} nav.tabs button.active .ic{filter:none;opacity:1}
+
+  section.tab{display:none} section.tab.active{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .foot{text-align:center;color:var(--faint);font-size:11.5px;margin:26px 0 8px}
+  /* calendar */
+  .calmonth{margin-bottom:20px}
+  .calhdr{font-size:17px;font-weight:800;letter-spacing:-.01em;margin:8px 4px 10px}
+  .calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+  .caldow{text-align:center;font-size:10.5px;font-weight:700;color:var(--faint);padding-bottom:2px}
+  .calday{aspect-ratio:1;border-radius:10px;background:var(--surface);box-shadow:var(--shadow);
+    padding:5px 3px 4px;display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden}
+  .calday.trip{background:color-mix(in srgb,var(--accent) 15%,var(--surface))}
+  .calday.today{outline:2px solid var(--accent);outline-offset:-2px}
+  .cnum{font-size:12.5px;font-weight:700;line-height:1}
+  .cnm{font-size:8px;font-weight:700;color:var(--accent);margin-top:1px;text-align:center;line-height:1.05;letter-spacing:-.02em}
+  .cdots{display:flex;gap:2px;margin-top:auto;padding-top:2px}
+  .cdot{width:6px;height:6px;border-radius:50%}
+  .cdot.train{background:var(--orange)} .cdot.dl{background:var(--red)} .cdot.dep{background:var(--accent)}
+  .callegend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin:6px 4px 0}
+  .callegend span{display:flex;align-items:center;gap:5px}
+  .callegend .lg{width:12px;height:12px;border-radius:4px;display:inline-block;background:color-mix(in srgb,var(--accent) 25%,var(--surface))}
+</style>
+</head>
+<body>
+
+<!-- TODAY -->
+<section class="tab active" id="tab-today">
+  <div class="kicker">Asia 2026 · Dylan + Zak</div>
+  <h1 class="largetitle">Today</h1>
+  <div class="hero" id="hero"></div>
+  <div class="copilot" id="copilot"></div>
+  <div class="grouphdr">Act now</div>
+  <div class="group" id="actnow"></div>
+  <div class="grouphdr">Next 7 days</div>
+  <div class="group" id="horizon"></div>
+</section>
+
+<!-- TRIP -->
+<section class="tab" id="tab-trip">
+  <div class="kicker">11 cities · 30 days</div>
+  <h1 class="largetitle">Your trip</h1>
+  <div id="cities"></div>
+  <div class="grouphdr">After Hong Kong · Dylan solo · SE Asia</div>
+  <div class="group note" style="margin-bottom:10px">
+    The open part of the journey — no dates locked, which is exactly where the co-pilot earns its keep.
+    Zak flies home Jul 21; Dylan continues ~2–3 months. Visa homework (NZ passport):
+  </div>
+  <div class="group" id="onward"></div>
+</section>
+
+<!-- CALENDAR -->
+<section class="tab" id="tab-calendar">
+  <div class="kicker">The locked leg at a glance</div>
+  <h1 class="largetitle">Calendar</h1>
+  <div id="cal"></div>
+  <div class="note" style="padding:14px 4px 0">SE Asia fills in here as you book it — the co-pilot will add days automatically.</div>
+</section>
+
+<!-- TRAINS -->
+<section class="tab" id="tab-trains">
+  <div class="kicker">Tap a train when you've booked it</div>
+  <h1 class="largetitle">Trains</h1>
+  <div class="group" id="trains"></div>
+  <div class="note" style="padding:14px 4px 0">
+    Book on <b>Trip.com</b> (works without a VPN in China). Tickets release 15 days before travel.
+    <b>Your passport is the ticket</b> — use the staffed manual gate. Arrive 40–50 min early at mega-stations.
+  </div>
+</section>
+
+<!-- MONEY -->
+<section class="tab" id="tab-money">
+  <div class="kicker">Tap a hotel when you've paid it</div>
+  <h1 class="largetitle">Money</h1>
+  <div class="grouphdr">Still to pay <span class="progress" id="payprog"></span></div>
+  <div class="group" id="payments"></div>
+  <div class="grouphdr">Totals outstanding</div>
+  <div class="group" id="totals"></div>
+  <div class="grouphdr">Budget <span class="progress" id="budgetstamp"></span></div>
+  <div class="group" id="budget"></div>
+  <div class="grouphdr">Currency converter <span class="progress" id="fxstamp"></span></div>
+  <div class="group" id="fxbox"></div>
+  <div class="grouphdr">How to pay</div>
+  <div class="group note">
+    <p><b>Alipay is the default everywhere in China</b> (link Visa/MC) — taxis, street food, metro QR, tickets. WeChat Pay as fallback; foreign-card terminals are rare outside big hotels.</p>
+    <p><b>Deposits (押金):</b> ¥100–500/night held at check-in at smaller hotels, refunded at checkout — that's the cash float.</p>
+    <p><b>Fees:</b> card-funded Alipay carries your card's ~2–3% FX margin. A Wise-type card kills most of it.</p>
+    <p><b>Japan:</b> Suica in Apple Wallet + some yen. <b>HK:</b> Octopus in Apple Wallet.</p>
+  </div>
+</section>
+
+<!-- PREP -->
+<section class="tab" id="tab-prep">
+  <div class="kicker">Saves as you tick · works offline</div>
+  <h1 class="largetitle">Prep</h1>
+  <div class="grouphdr">Before you fly <span class="progress" id="prepprog"></span></div>
+  <div class="group" id="prep-before"></div>
+  <div class="grouphdr">China setup · do before you arrive</div>
+  <div class="group" id="prep-china"></div>
+  <div class="grouphdr">Final 48 hours</div>
+  <div class="group" id="prep-final"></div>
+</section>
+
+<!-- SURVIVE -->
+<section class="tab" id="tab-survive">
+  <div class="kicker">Print a copy — phones die, VPNs drop</div>
+  <h1 class="largetitle">Survive</h1>
+  <div class="grouphdr">Taxi cards · show the driver</div>
+  <div class="group" id="taxi"></div>
+  <div class="note" style="padding:10px 4px 0">请送我去这个地址，谢谢 — "Please take me to this address, thanks."</div>
+
+  <div class="grouphdr">Apps & connectivity</div>
+  <div class="group note">
+    <p><b>Rides</b> Didi (in Alipay) · <b>Maps</b> Amap 高德 / Apple Maps (Google Maps is dead in China, even on VPN) · <b>Trains</b> Trip.com (no VPN needed) · <b>Metro</b> Alipay "Transport" QR · <b>Translate</b> offline packs + Pleco.</p>
+    <p><b>VPN reality:</b> Mullvad+Shadowsocks ≈ 50% on hotel WiFi — switch to eSIM data (routes out, no firewall) when it drops. Install the VPN <b>before</b> China; you can't download one inside.</p>
+  </div>
+
+  <div class="grouphdr">Heat & typhoons</div>
+  <div class="group note">
+    <p><b>Heat:</b> Chongqing / Xi'an / Shanghai run 33–40 °C with brutal humidity in July — outdoor mornings, indoor middays.</p>
+    <p><b>Typhoons:</b> Jul 15–21 (Xiamen→Shenzhen→HK) is typhoon season. HSR pre-emptively suspends; HK raises T8 signals that pause flights. <b>Zak's Jul 21 QF128 sits in this window.</b></p>
+    <p><b>Zhangjiajie:</b> afternoon thunderstorms; cable cars pause in lightning — do the big mountain day on the best-weather morning of your three.</p>
+  </div>
+
+  <div class="grouphdr">Emergencies</div>
+  <div class="group note">
+    <p><b>China</b> Police 110 · Ambulance 120 · Fire 119<br>
+    <b>Japan</b> Police 110 · Fire/Amb 119 &nbsp;·&nbsp; <b>Hong Kong</b> 999 (all)</p>
+    <p><b>NZ MFAT 24/7 consular:</b> +64 99 20 20 20 · embassies in Beijing, Shanghai, Guangzhou, HK.</p>
+  </div>
+</section>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="today" class="active"><span class="ic">🧭</span>Today</button>
+  <button data-tab="trip"><span class="ic">🗺️</span>Trip</button>
+  <button data-tab="calendar"><span class="ic">📅</span>Cal</button>
+  <button data-tab="trains"><span class="ic">🚄</span>Trains</button>
+  <button data-tab="money"><span class="ic">💴</span>Money</button>
+  <button data-tab="prep"><span class="ic">✅</span>Prep</button>
+  <button data-tab="survive"><span class="ic">🆘</span>Survive</button>
+</nav>
+
+<div class="foot" id="foot"></div>
+
+<script>
+/* ============================================================
+   DATA MODEL  —  the only thing you (or the co-pilot) edits.
+   Live state (booked / paid / ticked) is saved in the browser.
+   ============================================================ */
+const TRIP = {
+  departure:"2026-06-23", legEnd:"2026-07-22",
+  briefing:{ date:"2026-06-14",
+    text:"Caught a new one: teamLab Planets Tokyo confirmed for Jun 25 at 11:30 JST — 7,400 JPY paid (1 adult + 1 teen), QR shows on the day, take the subway to Shin-Toyosu not the bus. Train #1 opens Tuesday — book it on Trip.com the moment it opens. HK Jul 22 outbound flight still not booked." },
+
+  cities:[
+    {nm:"Tokyo",cc:"Japan",in:"2026-06-23",out:"2026-06-27",hotel:"APA Asakusa Tawaramachi",pay:"paid",img:"_assets/tokyo-sensoji.jpg"},
+    {nm:"Beijing",cc:"China",in:"2026-06-27",out:"2026-07-01",hotel:"Sunworld Dynasty Wangfujing",pay:"paid",flag:"Cancel-or-keep by Jun 25",img:"_assets/beijing-greatwall.jpg"},
+    {nm:"Xi'an",cc:"China",in:"2026-07-01",out:"2026-07-03",hotel:"Mcsrh Hotel Zhonggulou",pay:"due",city:"Xi'an",payAmt:"CNY 319.95",img:"_assets/xian-terracotta.jpg"},
+    {nm:"Chongqing",cc:"China",in:"2026-07-03",out:"2026-07-06",hotel:"Pilot Hotel",pay:"due",city:"Chongqing",payAmt:"CNY 662.69",img:"_assets/chongqing-hongyacave.jpg"},
+    {nm:"Chengdu",cc:"China",in:"2026-07-06",out:"2026-07-08",hotel:"Grand ParcVue Hotel",pay:"paid",img:"_assets/chengdu-panda.jpg"},
+    {nm:"Zhangjiajie",cc:"China",in:"2026-07-08",out:"2026-07-11",hotel:"SANHE Hotel Wulingyuan",pay:"paid",img:"_assets/zhangjiajie-pillars.jpg"},
+    {nm:"Furong Town",cc:"Hunan",in:"2026-07-11",out:"2026-07-12",hotel:"Theme Inn",pay:"due",city:"Furong",payAmt:"CNY 293.28",img:"_assets/furong-waterfall.jpg"},
+    {nm:"Shanghai",cc:"China",in:"2026-07-12",out:"2026-07-15",hotel:"Atour Hotel Bund Land Plaza",pay:"due",city:"Shanghai",payAmt:"CNY 4,232.94 · non-refundable",img:"_assets/shanghai-bund.jpg"},
+    {nm:"Xiamen",cc:"China",in:"2026-07-15",out:"2026-07-16",hotel:"Hotel NOA",pay:"paid",img:"_assets/xiamen-gulangyu.jpg"},
+    {nm:"Shenzhen",cc:"China",in:"2026-07-16",out:"2026-07-18",hotel:"Modena by Fraser",pay:"paid",img:"_assets/shenzhen-skyline.jpg"},
+    {nm:"Hong Kong",cc:"SAR",in:"2026-07-18",out:"2026-07-21",hotel:"Dorsett Kai Tak",pay:"paid",img:"_assets/hk-peakview.jpg"},
+    {nm:"HK Airport",cc:"Dylan solo",in:"2026-07-21",out:"2026-07-22",hotel:"Regala Skycity · onward Jul 22",pay:"paid",img:"_assets/hk-starferry.jpg"},
+  ],
+
+  trains:[
+    {id:1,from:"Beijing",to:"Xi'an",departs:"2026-07-01",opens:"2026-06-17",fare:"¥515",dur:"4.5–5 h",st:"北京西 → 西安北"},
+    {id:2,from:"Xi'an",to:"Chongqing",departs:"2026-07-03",opens:"2026-06-19",fare:"¥390",dur:"5–6 h",st:"西安北 → 重庆"},
+    {id:3,from:"Chongqing",to:"Chengdu",departs:"2026-07-06",opens:"2026-06-22",fare:"¥155",dur:"1.5 h",st:"重庆 → 成都东"},
+    {id:4,from:"Zhangjiajie",to:"Furong",departs:"2026-07-11",opens:"2026-06-27",fare:"¥30",dur:"35 min",st:"张家界西 → 芙蓉镇"},
+    {id:5,from:"Furong",to:"Shanghai",departs:"2026-07-12",opens:"2026-06-28",fare:"¥620",dur:"~7 h (transfer 长沙南)",st:"芙蓉镇 → 上海虹桥"},
+    {id:6,from:"Shanghai",to:"Xiamen",departs:"2026-07-15",opens:"2026-07-01",fare:"¥430",dur:"~5 h",st:"上海虹桥 → 厦门北"},
+    {id:7,from:"Xiamen",to:"Shenzhen",departs:"2026-07-16",opens:"2026-07-02",fare:"¥230",dur:"~3 h",st:"厦门北 → 深圳北"},
+    {id:8,from:"Shenzhen",to:"Hong Kong",departs:"2026-07-18",opens:"2026-07-04",fare:"¥75",dur:"~15 min",st:"福田 → 香港西九龙"},
+  ],
+
+  deadlines:[ {label:"Beijing Sunworld — cancel or keep",date:"2026-06-25",sev:"high",action:"Cancel free, or pay 1 night (~NZD 170). Decision needed."} ],
+
+  payments:[
+    {city:"Xi'an",what:"Mcsrh Hotel",amt:"CNY 319.95",note:"pay at check-in"},
+    {city:"Chongqing",what:"Pilot Hotel",amt:"CNY 662.69",note:"cancel free before Jul 3"},
+    {city:"Furong",what:"Theme Inn",amt:"CNY 293.28",note:"cancel free before Jul 8"},
+    {city:"Shanghai",what:"Atour Hotel",amt:"CNY 4,232.94",note:"≈NZD 1,060 · NON-REFUNDABLE · claim NZD 220 diff from Agoda after stay"},
+  ],
+  totals:[
+    {k:"Hotels outstanding",v:"≈ NZD 1,380"},
+    {k:"Trains (est.)",v:"~NZD 1,270"},
+    {k:"Grand total",v:"~NZD 2,650",grand:true},
+  ],
+
+  taxi:[
+    {c:"Tokyo",cn:"APA Hotel 浅草 田原町駅前",a:"東京都台東区西浅草1-2-3"},
+    {c:"Beijing",cn:"天伦王朝大饭店",a:"北京市东城区王府井大街50号 · +86 10 5816 8888"},
+    {c:"Xi'an",cn:"Mcsrh Hotel 钟鼓楼",a:"西安市碑林区东四道巷1号 · +86 185 0925 5698"},
+    {c:"Chongqing",cn:"Pilot Hotel",a:"重庆市渝中区朝天门陕西路3巷5栋9楼"},
+    {c:"Chengdu",cn:"Grand ParcVue",a:"成都市锦江区智慧街111号 · +86 28 8516 6999"},
+    {c:"Zhangjiajie",cn:"三和酒店",a:"张家界市武陵源区 (full pin from Agoda)"},
+    {c:"Furong",cn:"花千树主题客栈",a:"湘西州永顺县芙蓉镇新区社区走马坪14号"},
+    {c:"Shanghai",cn:"亚朵酒店 (南京东路外滩店)",a:"上海市黄浦区南京东路409号8楼"},
+    {c:"Xiamen",cn:"NOA酒店",a:"厦门市思明区莲岳路213号"},
+    {c:"Shenzhen",cn:"辉盛庭国际公寓 (Modena)",a:"深圳市罗湖区深南东路1001号 · +86 177 2248 4375"},
+    {c:"Hong Kong",cn:"香港启德帝盛酒店 (Dorsett)",a:"九龙启德承启道43号 · +852 3528 8288"},
+  ],
+
+  onward:[
+    {c:"Vietnam",v:"e-Visa REQUIRED · evisa.gov.vn (~US$25)"},
+    {c:"Thailand",v:"visa-free (verify 2026) · TDAC ≤72h"},
+    {c:"Cambodia",v:"e-Visa evisa.gov.kh (~US$36) / VoA"},
+    {c:"Laos",v:"VoA (~US$30–42, USD + photo) / e-Visa"},
+    {c:"Indonesia",v:"e-VoA (~NZD 50, 30 days) + levy"},
+    {c:"Philippines",v:"visa-free 30 days · needs onward ticket"},
+    {c:"Singapore",v:"visa-free 90 days · SG card ≤3 days"},
+    {c:"Malaysia",v:"visa-free 90 days · MDAC ≤3 days"},
+  ],
+
+  prep:{
+    before:[
+      "Book travel-health clinic appt (some vaccines need 2–4 weeks)",
+      "Apply Vietnam e-Visa · evisa.gov.vn",
+      "Passport valid 6+ months, 2+ blank pages",
+      "Install AND test China VPN (can't download inside China)",
+      "Tell bank/cards your travel dates + countries",
+      "Scan all docs to cloud + offline",
+      "Confirm China train bookings (release 15 days before)",
+      "Buy whole-trip travel insurance",
+    ],
+    china:[
+      "Alipay and/or WeChat Pay set up + card linked",
+      "Offline maps (Apple / Organic Maps) downloaded",
+      "Google Translate offline Chinese pack + Pleco",
+      "Some CNY cash as backup",
+    ],
+    final:[
+      "Online check-in + offline boarding passes",
+      "Charge all devices + power bank",
+      "Split cash: daypack / money belt / trolley",
+      "Submit arrival cards in their windows (TDAC, MDAC, SG)",
+      "Weigh the bag — leave room to spare",
+    ],
+  },
+};
+
+/* ===================== SAVED STATE (localStorage) ===================== */
+const LS="travelHQ.v1";
+let store=JSON.parse(localStorage.getItem(LS)||"{}");
+store.trains||={}; store.paid||={}; store.prep||={};
+const save=()=>localStorage.setItem(LS,JSON.stringify(store));
+const booked=id=>!!store.trains[id];
+const paid=city=>!!store.paid[city];
+const ticked=k=>!!store.prep[k];
+
+/* ===================== ENGINE (runs every open, free) ===================== */
+const pd=s=>{const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const today=(()=>{const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())})();
+const days=(a,b)=>Math.round((pd(b)-a)/864e5);
+const fmt=s=>pd(s).toLocaleDateString("en-NZ",{weekday:"short",day:"numeric",month:"short"});
+const rel=n=>n===0?"today":n===1?"tomorrow":n>0?`in ${n} days`:`${-n}d ago`;
+const tick=`<svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3.2L13 5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const whereNow=()=>TRIP.cities.find(c=>today>=pd(c.in)&&today<pd(c.out))||null;
+
+function renderHero(){
+  const dDep=days(today,TRIP.departure),here=whereNow();let big,where;
+  if(dDep>0){big=`<b>${dDep}</b> day${dDep===1?"":"s"} to departure`;where=`Wheels up ${fmt(TRIP.departure)} · WLG → Tokyo`;}
+  else if(here){const dayN=Math.round((today-pd(TRIP.departure))/864e5)+1;
+    big=`Day <b>${dayN}</b> · ${here.nm}`;where=`${here.cc} · checked in till ${fmt(here.out)}`;}
+  else if(today<=pd(TRIP.legEnd)){big="On the move";where="Between cities";}
+  else{big="<b>SE Asia</b> leg";where="Locked itinerary done — onward & freestyle";}
+  hero.innerHTML=`<div class="big">${big}</div><div class="where">${where}</div>`;
+  document.getElementById("copilot").innerHTML=
+    `<div class="lab">◆ Co-pilot</div><p>${TRIP.briefing.text}</p><div class="stamp">briefing · ${fmt(TRIP.briefing.date)}</div>`;
+}
+
+function renderToday(){
+  const act=[],hor=[],here=whereNow();
+  if(here)act.push({cls:"now",dot:"var(--accent)",t:`You're in ${here.nm}`,when:"now",
+    d:here.pay==="due"?`${here.hotel} — pay at checkout`:`${here.hotel}`});
+  TRIP.trains.forEach(t=>{ if(booked(t.id))return;
+    const o=days(today,t.opens);
+    if(o<=0)act.push({cls:"now",dot:"var(--red)",t:`Book Train ${t.id}: ${t.from} → ${t.to}`,when:rel(o)+" · open",
+      d:`Departs ${fmt(t.departs)} · ${t.fare} pp · ${t.dur}. Book on Trip.com.`});
+    else if(o<=7)hor.push({date:t.opens,cls:"soon",dot:"var(--orange)",t:`Train ${t.id} opens: ${t.from} → ${t.to}`,when:rel(o),
+      d:`Departs ${fmt(t.departs)} · book the moment it opens.`});
+  });
+  TRIP.deadlines.forEach(x=>{const dl=days(today,x.date);if(dl<0)return;
+    const it={date:x.date,cls:dl<=2?"now":"soon",dot:dl<=2?"var(--red)":"var(--orange)",t:x.label,when:rel(dl),d:x.action};
+    if(dl<=2)act.push(it);else if(dl<=14)hor.push(it);});
+  const draw=(arr,el,empty)=>{
+    if(!arr.length){el.innerHTML=`<div class="empty">${empty}</div>`;return;}
+    arr.sort((a,b)=>(a.date&&b.date)?pd(a.date)-pd(b.date):0);
+    el.innerHTML=arr.map(i=>`<div class="urgent ${i.cls}">
+      <div class="top"><div class="t"><span class="dot" style="background:${i.dot}"></span>${i.t}</div><div class="when">${i.when}</div></div>
+      <div class="d">${i.d}</div></div>`).join("");};
+  draw(act,actnow,"Nothing needs you right now. Breathe. ☕");
+  draw(hor,horizon,"Clear for the next week.");
+}
+
+function renderCities(){
+  cities.innerHTML=TRIP.cities.map(c=>{
+    const n=days(pd(c.in),c.out),cur=today>=pd(c.in)&&today<pd(c.out);
+    const p=c.pay==="due"&&!paid(c.city);
+    const badge=p?`<span class="badge b-orange">${c.payAmt}</span>`:`<span class="badge b-green">paid</span>`;
+    const flag=c.flag?`<span class="badge b-red">${c.flag}</span>`:"";
+    return `<div class="city${cur?" current":""}">
+      <img loading="lazy" src="${c.img}" alt="" onerror="this.style.display='none'"><div class="grad"></div>
+      <div class="tr">${badge}</div>
+      <div class="body"><div class="nm">${c.nm}<span class="cc">${c.cc}</span></div>
+        <div class="meta">${fmt(c.in)} → ${fmt(c.out)} · ${n} night${n===1?"":"s"} ${flag}</div>
+        <div class="hot">${c.hotel}</div></div></div>`;}).join("");
+  onward.innerHTML=TRIP.onward.map(x=>
+    `<div class="row"><div class="main"><div class="t">${x.c}</div><div class="d">${x.v}</div></div></div>`).join("");
+}
+
+function renderTrains(){
+  trains.innerHTML=TRIP.trains.map(t=>{
+    const b=booked(t.id),o=days(today,t.opens);
+    const right=b?`<span class="badge b-green">booked</span>`
+      :o<=0?`<span class="badge b-red">book now</span>`:`<span class="badge b-grey">opens ${rel(o)}</span>`;
+    return `<div class="row tap${b?" done":""}" data-train="${t.id}">
+      <div class="chk${b?" on":""}">${tick}</div>
+      <div class="main"><div class="t">Train ${t.id} · ${t.from} → ${t.to}</div>
+        <div class="d">${fmt(t.departs)} · ${t.fare} pp · ${t.dur} · ${t.st}</div></div>
+      <div class="r">${right}</div></div>`;}).join("");
+}
+
+function renderMoney(){
+  payments.innerHTML=TRIP.payments.map(p=>{
+    const done=paid(p.city);
+    return `<div class="row tap${done?" done":""}" data-pay="${p.city}">
+      <div class="chk${done?" on":""}">${tick}</div>
+      <div class="main"><div class="t">${p.city} · ${p.what}</div><div class="d">${p.note}</div></div>
+      <div class="r"><span class="badge ${done?"b-green":"b-orange"}">${done?"paid":p.amt}</span></div></div>`;}).join("");
+  const left=TRIP.payments.filter(p=>!paid(p.city)).length;
+  document.getElementById("payprog").textContent=`${TRIP.payments.length-left}/${TRIP.payments.length} paid`;
+  document.getElementById("totals").innerHTML=TRIP.totals.map(t=>
+    `<div class="totrow${t.grand?" grand":""}"><span>${t.k}</span><span class="v">${t.v}</span></div>`).join("");
+}
+
+function renderPrep(){
+  const list=(arr,group)=>arr.map((txt,i)=>{const k=group+":"+i,on=ticked(k);
+    return `<div class="row tap${on?" done":""}" data-prep="${k}">
+      <div class="chk${on?" on":""}">${tick}</div><div class="main"><div class="t">${txt}</div></div></div>`;}).join("");
+  document.getElementById("prep-before").innerHTML=list(TRIP.prep.before,"b");
+  document.getElementById("prep-china").innerHTML=list(TRIP.prep.china,"c");
+  document.getElementById("prep-final").innerHTML=list(TRIP.prep.final,"f");
+  const all=TRIP.prep.before.length+TRIP.prep.china.length+TRIP.prep.final.length;
+  const done=Object.values(store.prep).filter(Boolean).length;
+  document.getElementById("prepprog").textContent=`${done}/${all} done`;
+}
+
+function renderStatic(){
+  document.getElementById("taxi").innerHTML=TRIP.taxi.map(x=>
+    `<div class="row"><div class="main"><div class="cn">${x.c} · ${x.cn}</div><div class="addr">${x.a}</div></div></div>`).join("");
+  document.getElementById("foot").textContent=
+    "Self-contained · offline · saves on this device · recomputes every open · "+today.toLocaleDateString("en-NZ",{day:"numeric",month:"short",year:"numeric"});
+}
+
+function renderAll(){renderHero();renderToday();renderCities();renderTrains();renderMoney();renderPrep();}
+renderStatic();renderAll();
+
+/* ===================== INTERACTIONS ===================== */
+document.body.addEventListener("click",e=>{
+  const tr=e.target.closest("[data-train]");
+  const pay=e.target.closest("[data-pay]");
+  const pr=e.target.closest("[data-prep]");
+  if(tr){const id=tr.dataset.train;store.trains[id]=!store.trains[id];save();renderTrains();renderToday();}
+  else if(pay){const c=pay.dataset.pay;store.paid[c]=!store.paid[c];save();renderMoney();renderCities();renderToday();}
+  else if(pr){const k=pr.dataset.prep;store.prep[k]=!store.prep[k];save();renderPrep();}
+});
+
+document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("#tabs button").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll("section.tab").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  document.getElementById("tab-"+b.dataset.tab).classList.add("active");
+  window.scrollTo({top:0,behavior:"smooth"});
+}));
+</script>
+
+<script>
+/* ===== Budget & currency — reuses TRIP / store / save / fmt from the script above ===== */
+(function(){
+  TRIP.fx={date:"2026-06-14",base:"NZD",
+    rates:{NZD:1,CNY:0.253,HKD:0.078,JPY:0.0108,USD:0.61,SGD:0.45,THB:0.052,MYR:0.13,VND:0.000024,IDR:0.000038}};
+  TRIP.spend=TRIP.spend||[];        /* co-pilot appends {date,city,cur,amt,what} from receipts */
+  TRIP.outstanding=2650;            /* ~NZD (hotels + trains) */
+  const CUR=["NZD","CNY","HKD","JPY","USD","SGD","THB","MYR","VND","IDR"];
+  const sym={NZD:"NZ$",CNY:"¥CNY",HKD:"HK$",JPY:"¥JPY",USD:"US$",SGD:"S$",THB:"฿THB",MYR:"RM",VND:"₫VND",IDR:"Rp"};
+  store.localSpend=store.localSpend||[];
+  let fx={amt:100,from:"CNY",to:"NZD"}, adding=false;
+  const r=TRIP.fx.rates;
+  const toNZD=(a,c)=>a*(r[c]||0);
+  const conv=(a,f,t)=>a*(r[f]||0)/(r[t]||1);
+  const money=n=>(isFinite(n)?n:0).toLocaleString("en-NZ",{maximumFractionDigits:2});
+  const $=id=>document.getElementById(id);
+  const inp="font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--surface2);color:var(--ink)";
+
+  function renderFx(){
+    const opts=c=>CUR.map(x=>`<option value="${x}"${x===c?" selected":""}>${sym[x]}</option>`).join("");
+    $("fxstamp").textContent="rates "+fmt(TRIP.fx.date);
+    $("fxbox").innerHTML=
+      `<div class="row" style="gap:9px;flex-wrap:wrap;align-items:center">
+         <input id="fxAmt" type="number" inputmode="decimal" value="${fx.amt}" style="${inp};width:96px">
+         <select id="fxFrom" style="${inp}">${opts(fx.from)}</select>
+         <span style="color:var(--faint)">→</span>
+         <select id="fxTo" style="${inp}">${opts(fx.to)}</select>
+         <div class="t" id="fxRes" style="margin-left:auto;font-size:19px;font-weight:800"></div>
+       </div>
+       <div class="note" style="padding:8px 16px 14px">¥1 CNY ≈ NZ$${r.CNY} · HK$1 ≈ NZ$${r.HKD} · ¥1 JPY ≈ NZ$${r.JPY} — the co-pilot refreshes these each morning.</div>`;
+    updFx();
+  }
+  function updFx(){ const e=$("fxRes"); if(e) e.textContent=sym[fx.to]+" "+money(conv(fx.amt,fx.from,fx.to)); }
+
+  function spent(){ return [...TRIP.spend,...store.localSpend].reduce((s,e)=>s+toNZD(e.amt,e.cur),0); }
+  function renderBudget(){
+    const s=spent(), planned=store.budget||null, recent=[...TRIP.spend,...store.localSpend].slice(-6).reverse();
+    let h=`<div class="totrow"><span>Spent so far</span><span class="v">NZ$ ${money(s)}</span></div>
+           <div class="totrow"><span>Still outstanding</span><span class="v">~NZ$ ${TRIP.outstanding.toLocaleString("en-NZ")}</span></div>`;
+    h+= planned
+      ? `<div class="totrow grand"><span>Left of budget</span><span class="v">NZ$ ${money(planned-s-TRIP.outstanding)}</span></div>`
+      : `<div class="row tap" id="setBud"><div class="main"><div class="t" style="color:var(--accent)">Set a trip budget</div><div class="d">optional — track what's left</div></div></div>`;
+    h+= adding
+      ? `<div class="row" style="gap:8px;flex-wrap:wrap;align-items:center">
+           <input id="eAmt" type="number" inputmode="decimal" placeholder="amount" style="${inp};width:92px">
+           <select id="eCur" style="${inp}">${CUR.map(x=>`<option${x==="CNY"?" selected":""}>${x}</option>`).join("")}</select>
+           <input id="eWhat" placeholder="what for" style="${inp};flex:1;min-width:100px">
+           <button id="eSave" style="${inp};background:var(--accent);color:#fff;border:none;font-weight:700;cursor:pointer">Save</button>
+           <button id="eCancel" style="${inp};cursor:pointer">✕</button>
+         </div>`
+      : `<div class="row tap" id="addExp"><div class="main"><div class="t" style="color:var(--accent)">＋ Add an expense</div><div class="d">saved on this device · or the co-pilot logs it from receipts</div></div></div>`;
+    recent.forEach(e=>{ h+=`<div class="row"><div class="main"><div class="t">${e.what||e.city||"Spend"}</div><div class="d">${e.city?e.city+" · ":""}${e.cur} ${e.amt}</div></div><div class="r">NZ$ ${money(toNZD(e.amt,e.cur))}</div></div>`; });
+    $("budget").innerHTML=h;
+  }
+
+  document.body.addEventListener("input",e=>{ if(e.target.id==="fxAmt"){fx.amt=parseFloat(e.target.value)||0;updFx();} });
+  document.body.addEventListener("change",e=>{
+    if(e.target.id==="fxFrom"){fx.from=e.target.value;updFx();}
+    else if(e.target.id==="fxTo"){fx.to=e.target.value;updFx();}
+  });
+  document.body.addEventListener("click",e=>{
+    if(e.target.closest("#addExp")){adding=true;renderBudget();}
+    else if(e.target.closest("#eCancel")){adding=false;renderBudget();}
+    else if(e.target.closest("#eSave")){
+      const a=parseFloat($("eAmt").value);
+      if(a>0)store.localSpend.push({date:new Date().toISOString().slice(0,10),cur:$("eCur").value,amt:a,what:($("eWhat").value||"Spend")});
+      save(); adding=false; renderBudget();
+    }
+    else if(e.target.closest("#setBud")){ const v=parseFloat(prompt("Trip budget in NZD?")||""); if(v>0){store.budget=v;save();renderBudget();} }
+  });
+
+  renderFx(); renderBudget();
+})();
+</script>
+
+<script>
+/* ===== Calendar — reuses TRIP / pd / today / fmt from above ===== */
+(function(){
+  const cont=document.getElementById("cal"); if(!cont) return;
+  const t=v=>pd(v).getTime();
+  const cityOn=d=>TRIP.cities.find(c=>d>=pd(c.in)&&d<pd(c.out));
+  const months=[{y:2026,m:5,label:"June 2026"},{y:2026,m:6,label:"July 2026"}];
+  const dow=["S","M","T","W","T","F","S"]; let html="";
+  months.forEach(mo=>{
+    const startDow=new Date(mo.y,mo.m,1).getDay(), daysIn=new Date(mo.y,mo.m+1,0).getDate();
+    html+=`<div class="calmonth"><div class="calhdr">${mo.label}</div><div class="calgrid">`;
+    dow.forEach(d=>html+=`<div class="caldow">${d}</div>`);
+    for(let i=0;i<startDow;i++) html+=`<div></div>`;
+    for(let day=1;day<=daysIn;day++){
+      const dt=new Date(mo.y,mo.m,day), tm=dt.getTime(), c=cityOn(dt);
+      let cls="calday"; if(c) cls+=" trip"; if(tm===today.getTime()) cls+=" today";
+      let dots="";
+      if(TRIP.trains.some(x=>t(x.opens)===tm)) dots+=`<span class="cdot train"></span>`;
+      if(TRIP.deadlines.some(x=>t(x.date)===tm)) dots+=`<span class="cdot dl"></span>`;
+      if(tm===t(TRIP.departure)) dots+=`<span class="cdot dep"></span>`;
+      const nm=c?c.nm.split(" ")[0].slice(0,4):"";
+      html+=`<div class="${cls}"><div class="cnum">${day}</div><div class="cnm">${nm}</div><div class="cdots">${dots}</div></div>`;
+    }
+    html+=`</div></div>`;
+  });
+  html+=`<div class="callegend"><span><span class="lg"></span>in a city</span><span><span class="cdot dep"></span>fly out</span><span><span class="cdot train"></span>train opens</span><span><span class="cdot dl"></span>deadline</span></div>`;
+  cont.innerHTML=html;
+})();
+</script>
+</body>
+</html>
