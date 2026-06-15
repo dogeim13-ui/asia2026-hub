@@ -258,6 +258,17 @@
   .dleg{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600}
   .dleg .ddot{width:10px;height:10px;border-radius:3px;flex:none}
   .dleg .dval{margin-left:auto;color:var(--muted);font-weight:600}
+
+  /* cross-device sync chip */
+  .syncchip{display:flex;align-items:center;gap:9px;background:var(--surface);border-radius:14px;box-shadow:var(--shadow);
+    padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--muted)}
+  .syncchip .sdot{width:8px;height:8px;border-radius:50%;background:var(--faint);flex:none}
+  .syncchip.ok .sdot{background:var(--green)}
+  .syncchip span.lbl{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .syncchip button{background:var(--accent);color:#fff;border:0;border-radius:980px;font-family:inherit;font-weight:700;
+    font-size:12.5px;padding:6px 13px;cursor:pointer;flex:none}
+  .syncchip.ok button{background:var(--surface2);color:var(--muted)}
+  .syncchip button:active{opacity:.7}
 </style>
 </head>
 <body>
@@ -266,6 +277,7 @@
 <section class="tab active" id="tab-today">
   <div class="kicker">Asia 2026 · Dylan + Zak</div>
   <h1 class="largetitle">Today</h1>
+  <div id="syncBar"></div>
   <div class="hero" id="hero"></div>
   <div class="copilot" id="copilot"></div>
   <div class="grouphdr">Act now</div>
@@ -404,8 +416,8 @@
    ============================================================ */
 const TRIP = {
   departure:"2026-06-23", legEnd:"2026-07-22",
-  briefing:{ date:"2026-06-15",
-    text:"T1 (Beijing→Xi'an) auto-books in 2 days — watch Trip.com Jun 17 at 08:00. HK Jul 22 onward flight is still unbooked — China entry requires proof of onward travel, so get this sorted this week. Sunworld cancel deadline Jun 25 coming up (10 days)." },
+  briefing:{ date:"2026-06-16",
+    text:"Disneyland (Jun 24) tickets aren't sorted — no gate sales, you must buy via the Tokyo Disney Resort app before you fly. T1 auto-fires tomorrow Jun 17 at 08:00. HK Jul 22 onward flight still unbooked — sort this today." },
 
   cities:[
     {nm:"Tokyo",cc:"Japan",in:"2026-06-23",out:"2026-06-27",hotel:"APA Asakusa Tawaramachi",pay:"paid",img:"_assets/tokyo-sensoji.jpg"},
@@ -502,7 +514,7 @@ const TRIP = {
   /* Per-city travel info for the city pages. Co-pilot enriches `attractions`, `tips`, `weather` over time.
      attractions: {n:name, d:short why}. tips: plain strings. */
   cityInfo:{
-    "Tokyo":{attractions:[
+    "Tokyo":{weather:"27–28°C, humid, tsuyu (plum rain) season — afternoon showers likely Jun 23–27. Pack an umbrella and a light layer; mornings are fine.",attractions:[
       {n:"Sensō-ji & Nakamise",d:"Asakusa's grand temple + market street — 5 min from your hotel."},
       {n:"teamLab Planets",d:"Booked Thu 25th 11:30 — barefoot digital art, Toyosu."},
       {n:"Shibuya Sky",d:"Open-air rooftop over the famous crossing — sunset slots sell out."},
@@ -637,7 +649,8 @@ const LS="travelHQ.v1";
 let store=JSON.parse(localStorage.getItem(LS)||"{}");
 store.trains||={}; store.paid||={}; store.prep||={};
 store.prepAdd||={}; store.prepRem||={}; store.prepCats||=[]; store.prepNotes||="";
-const save=()=>localStorage.setItem(LS,JSON.stringify(store));
+const save=()=>{localStorage.setItem(LS,JSON.stringify(store)); if(window.HUB_PUSH)window.HUB_PUSH();};
+window.HUB_STORE=store; window.HUB_LS=LS;  // exposed for the Firebase sync layer (store is mutated in place, never reassigned)
 const booked=id=>!!store.trains[id];
 const paid=city=>!!store.paid[city];
 const ticked=k=>!!store.prep[k];
@@ -873,13 +886,19 @@ document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",
   setPrepEdit(false);
   window.scrollTo({top:0,behavior:"smooth"});
 }));
+
+/* re-render core views when a cross-device sync lands (dispatched by the Firebase layer) */
+window.addEventListener("hub:sync",()=>{
+  renderAll();
+  const pn=document.getElementById("prepNotes"); if(pn&&document.activeElement!==pn)pn.value=store.prepNotes||"";
+});
 </script>
 
 <script>
 /* ===== Budget & forecast engine — your solo NZD pot. Reuses TRIP/store/save/fmt/pd/today/days. Recomputes live, offline. ===== */
 (function(){
-  TRIP.fx={date:"2026-06-15",base:"NZD",
-    rates:{NZD:1,CNY:0.2535,HKD:0.213,JPY:0.01104,USD:0.61,SGD:0.45,THB:0.052,MYR:0.13,VND:0.000024,IDR:0.000038}};
+  TRIP.fx={date:"2026-06-16",base:"NZD",
+    rates:{NZD:1,CNY:0.248,HKD:0.213,JPY:0.01075,USD:0.61,SGD:0.45,THB:0.052,MYR:0.13,VND:0.000024,IDR:0.000038}};
 
   /* ---- THE PLAN (file-editable; co-pilot keeps daily rates + FX honest) ---- */
   const PLAN={
@@ -1086,6 +1105,7 @@ document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",
       const o=store.bud.stages[s.region]||{};if(d>=0)o.days=d;if(rate>=0)o.daily=rate;store.bud.stages[s.region]=o;save();renderBudget();}}
   });
 
+  window.addEventListener("hub:sync",()=>{renderFx();renderBudget();renderAdjust();});
   renderFx();renderBudget();renderAdjust();
 })();
 </script>
@@ -1235,6 +1255,82 @@ document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",
   document.getElementById("cmBack").addEventListener("click",()=>{try{history.back();}catch(e){close();}});
   window.addEventListener("popstate",()=>{if(modal.classList.contains("open"))close();});
 })();
+</script>
+
+<script type="module">
+/* ===== Cross-device sync — Firebase (Firestore + Google Sign-In).
+   localStorage stays the instant offline cache; this layer mirrors it to the cloud and across devices.
+   Degrades gracefully: offline or if Firebase is unreachable, the app just runs local-only. ===== */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAtCSXNe8_rJXAEJ6q7eWY-XMhfrOEYU7s",
+  authDomain: "asia2026-hub.firebaseapp.com",
+  projectId: "asia2026-hub",
+  storageBucket: "asia2026-hub.firebasestorage.app",
+  messagingSenderId: "16898755431",
+  appId: "1:16898755431:web:6110e2f004d4b978303dc2"
+};
+
+const S=window.HUB_STORE||{}, LS=window.HUB_LS||"travelHQ.v1";
+let auth=null, db=null, provider=null, ref=null, unsub=null, pushTimer=null;
+
+function renderSyncBar(user){
+  const el=document.getElementById("syncBar"); if(!el)return;
+  el.innerHTML = user
+    ? `<div class="syncchip ok"><span class="sdot"></span><span class="lbl">Synced · ${user.email||"signed in"}</span><button id="signOutBtn">Sign out</button></div>`
+    : `<div class="syncchip"><span class="sdot"></span><span class="lbl">Turn on cross-device sync</span><button id="signInBtn">Sign in</button></div>`;
+}
+renderSyncBar(null);
+
+try{
+  const app=initializeApp(firebaseConfig);
+  auth=getAuth(app); db=getFirestore(app); provider=new GoogleAuthProvider();
+}catch(err){ console.warn("[sync] Firebase init failed — running local-only.",err); }
+
+/* merge a cloud snapshot into the in-place store object, then re-render every view */
+function applyRemote(remote){
+  if(!remote||typeof remote!=="object")return;
+  const seen={}, merged=[];
+  (remote.localSpend||[]).concat(S.localSpend||[]).forEach(e=>{
+    const id=e&&(e.id||[e.date,e.amt,e.cur,e.what].join("|"));
+    if(id&&!seen[id]){seen[id]=1;merged.push(e);}
+  });
+  Object.keys(remote).forEach(k=>{S[k]=remote[k];});
+  S.localSpend=merged;
+  S.trains=S.trains||{}; S.paid=S.paid||{}; S.prep=S.prep||{};
+  S.prepAdd=S.prepAdd||{}; S.prepRem=S.prepRem||{}; S.prepCats=S.prepCats||[];
+  S.cityNotes=S.cityNotes||{}; S.bud=S.bud||{}; S.bud.stages=S.bud.stages||{};
+  try{ localStorage.setItem(LS,JSON.stringify(S)); }catch(e){}
+  window.dispatchEvent(new Event("hub:sync"));
+}
+
+async function pushNow(){ if(!ref)return; try{ await setDoc(ref,{store:S,updatedAt:Date.now()}); }catch(err){ console.warn("[sync] push failed",err); } }
+window.HUB_PUSH=()=>{ if(!ref)return; clearTimeout(pushTimer); pushTimer=setTimeout(pushNow,800); };
+
+if(auth) onAuthStateChanged(auth, async user=>{
+  renderSyncBar(user);
+  if(unsub){unsub();unsub=null;}
+  if(!user){ ref=null; return; }
+  ref=doc(db,"hubs",user.uid);
+  try{
+    const snap=await getDoc(ref);
+    if(snap.exists()&&snap.data()&&snap.data().store) applyRemote(snap.data().store);
+    else await pushNow();   // first sign-in on this account: seed the cloud from this device
+  }catch(err){ console.warn("[sync] initial read failed",err); }
+  unsub=onSnapshot(ref, snap=>{
+    if(!snap.exists()||snap.metadata.hasPendingWrites) return;  // ignore our own pending writes
+    const d=snap.data(); if(d&&d.store) applyRemote(d.store);
+  }, err=>console.warn("[sync] listen failed",err));
+});
+
+document.addEventListener("click",e=>{
+  const t=e.target; if(!t)return;
+  if(t.id==="signInBtn"&&auth){ signInWithPopup(auth,provider).catch(err=>{ console.warn("[sync] sign-in",err); alert("Sign-in failed: "+((err&&err.message)||err)); }); }
+  else if(t.id==="signOutBtn"&&auth){ signOut(auth); }
+});
 </script>
 </body>
 </html>
