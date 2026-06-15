@@ -298,8 +298,8 @@
    ============================================================ */
 const TRIP = {
   departure:"2026-06-23", legEnd:"2026-07-22",
-  briefing:{ date:"2026-06-14",
-    text:"Caught a new one: teamLab Planets Tokyo confirmed for Jun 25 at 11:30 JST — 7,400 JPY paid (1 adult + 1 teen), QR shows on the day, take the subway to Shin-Toyosu not the bus. Train #1 opens Tuesday — book it on Trip.com the moment it opens. HK Jul 22 outbound flight still not booked." },
+  briefing:{ date:"2026-06-15",
+    text:"T1 (Beijing→Xi'an) auto-books in 2 days — watch Trip.com Jun 17 at 08:00. HK Jul 22 onward flight is still unbooked — China entry requires proof of onward travel, so get this sorted this week. Sunworld cancel deadline Jun 25 coming up (10 days)." },
 
   cities:[
     {nm:"Tokyo",cc:"Japan",in:"2026-06-23",out:"2026-06-27",hotel:"APA Asakusa Tawaramachi",pay:"paid",img:"_assets/tokyo-sensoji.jpg"},
@@ -604,8 +604,8 @@ document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",
 <script>
 /* ===== Budget & forecast engine — your solo NZD pot. Reuses TRIP/store/save/fmt/pd/today/days. Recomputes live, offline. ===== */
 (function(){
-  TRIP.fx={date:"2026-06-14",base:"NZD",
-    rates:{NZD:1,CNY:0.253,HKD:0.078,JPY:0.0108,USD:0.61,SGD:0.45,THB:0.052,MYR:0.13,VND:0.000024,IDR:0.000038}};
+  TRIP.fx={date:"2026-06-15",base:"NZD",
+    rates:{NZD:1,CNY:0.2535,HKD:0.213,JPY:0.01104,USD:0.61,SGD:0.45,THB:0.052,MYR:0.13,VND:0.000024,IDR:0.000038}};
 
   /* ---- THE PLAN (file-editable; co-pilot keeps daily rates + FX honest) ---- */
   const PLAN={
