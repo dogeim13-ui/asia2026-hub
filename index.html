@@ -42,12 +42,26 @@
   .hero .big b{color:var(--accent)}
   .hero .where{font-size:14px;color:var(--muted);margin-top:3px}
 
-  /* Co-pilot card */
-  .copilot{background:linear-gradient(135deg,#0a84ff 0%,#0071e3 100%);color:#fff;
-    border-radius:20px;padding:16px 18px;box-shadow:0 8px 24px rgba(0,113,227,.28);margin-bottom:6px}
-  .copilot .lab{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
-  .copilot p{margin:7px 0 0;font-size:15px;line-height:1.5;font-weight:500}
-  .copilot .stamp{font-size:12px;opacity:.8;margin-top:9px}
+  /* Co-pilot card — a clearly-branded daily briefing */
+  .copilot{background:linear-gradient(135deg,#0a84ff 0%,#0064d6 100%);color:#fff;
+    border-radius:22px;padding:16px 18px 15px;box-shadow:0 10px 30px rgba(0,113,227,.32);margin-bottom:10px;position:relative;overflow:hidden}
+  .copilot::after{content:"";position:absolute;top:-44px;right:-34px;width:170px;height:170px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,255,255,.18),transparent 70%);pointer-events:none}
+  .cop-head{display:flex;align-items:center;gap:11px;position:relative}
+  .cop-av{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.22);flex:none;
+    display:flex;align-items:center;justify-content:center;font-size:18px}
+  .cop-id{flex:1;min-width:0}
+  .cop-name{font-size:15px;font-weight:800;letter-spacing:-.01em}
+  .cop-sub{font-size:12px;opacity:.85;margin-top:1px}
+  .cop-info{width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.55);background:none;color:#fff;
+    font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;flex:none;line-height:1}
+  .cop-info:active{background:rgba(255,255,255,.22)}
+  .cop-msg{margin:13px 0 0;font-size:15.5px;line-height:1.5;font-weight:500;position:relative}
+  .cop-foot{font-size:12px;opacity:.82;margin-top:11px;display:flex;align-items:center;gap:7px;position:relative}
+  .cop-foot .pulse{width:7px;height:7px;border-radius:50%;background:#fff;flex:none;animation:cpulse 2.4s infinite}
+  @keyframes cpulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.5)}70%{box-shadow:0 0 0 8px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+  .cop-explain{margin:12px 0 0;padding:12px 14px;background:rgba(255,255,255,.16);border-radius:14px;font-size:13.5px;line-height:1.55;position:relative}
+  .cop-explain[hidden]{display:none}
 
   /* Grouped card list (iOS inset grouped) */
   .group{background:var(--surface);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
@@ -162,6 +176,88 @@
   .btn-save:active{opacity:.85}
   .savehint{font-size:12.5px;color:var(--faint);text-align:center;line-height:1.55;margin:10px 6px 0}
   .savehint b{color:var(--muted)}
+  #prepNotes{margin:2px 0 4px}
+  .addcat{display:none;width:100%;background:var(--surface);color:var(--accent);border:1px dashed var(--line);border-radius:12px;
+    font-family:inherit;font-size:14.5px;font-weight:600;padding:12px;margin-top:10px;cursor:pointer}
+  body.prepedit .addcat{display:block}
+  .addcat:active{opacity:.6}
+
+  /* Journey timeline */
+  .timeline{position:relative;margin:2px 0 4px}
+  .tl-item{position:relative;display:flex;gap:13px;padding-bottom:16px}
+  .tl-item:last-child{padding-bottom:0}
+  .tl-rail{position:relative;flex:none;width:40px;display:flex;justify-content:center}
+  .tl-dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;
+    background:var(--surface);box-shadow:var(--shadow);z-index:1;border:2px solid var(--line)}
+  .tl-dot.green{border-color:var(--green)} .tl-dot.orange{border-color:var(--orange)}
+  .tl-dot.red{border-color:var(--red)} .tl-dot.blue{border-color:var(--accent)}
+  .tl-line{position:absolute;top:40px;bottom:-16px;left:50%;width:2px;background:var(--line);transform:translateX(-50%)}
+  .tl-item:last-child .tl-line{display:none}
+  .tl-card{flex:1;min-width:0;background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:11px 14px}
+  .tl-top{display:flex;align-items:flex-start;gap:9px;justify-content:space-between}
+  .tl-route{font-size:15px;font-weight:700;letter-spacing:-.01em;min-width:0}
+  .tl-meta{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.5}
+
+  /* city tile tap chevron */
+  .city-go{position:absolute;bottom:13px;right:14px;color:#fff;font-size:24px;font-weight:300;opacity:.7;line-height:1}
+
+  /* city detail overlay (iOS push navigation) */
+  .citymodal{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;
+    transform:translateX(100%);transition:transform .34s cubic-bezier(.32,.72,0,1);visibility:hidden;
+    padding:0 18px calc(40px + env(safe-area-inset-bottom))}
+  .citymodal.open{transform:none;visibility:visible}
+  .cm-bar{position:sticky;top:0;z-index:3;margin:0 -18px;padding:calc(8px + env(safe-area-inset-top)) 12px 9px;
+    background:var(--tabbar);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+    border-bottom:1px solid var(--line)}
+  .cm-back{background:none;border:0;color:var(--accent);font-family:inherit;font-size:17px;font-weight:600;
+    letter-spacing:-.01em;cursor:pointer;padding:4px 4px;display:inline-flex;align-items:center;gap:1px}
+  .cm-back:active{opacity:.5}
+  .cm-hero{position:relative;border-radius:20px;overflow:hidden;height:188px;margin:14px 0 6px;
+    display:flex;align-items:flex-end;background:#222;box-shadow:var(--shadow)}
+  .cm-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .cm-hero .grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.82),rgba(0,0,0,.05) 70%)}
+  .cm-hero .body{position:relative;padding:15px 17px;color:#fff;width:100%}
+  .cm-hero .nm{font-size:28px;font-weight:800;letter-spacing:-.02em}
+  .cm-hero .meta{font-size:13.5px;opacity:.93;margin-top:3px}
+  .cm-note{font-family:inherit;width:100%;border:0;background:var(--surface);border-radius:14px;padding:13px 15px;
+    color:var(--ink);font-size:14.5px;line-height:1.55;box-shadow:var(--shadow);resize:vertical;min-height:70px;outline:none}
+  .cm-note::placeholder{color:var(--faint)}
+  .att .t{font-size:15px;font-weight:600;letter-spacing:-.01em}
+  .att .d{font-size:13.5px;color:var(--muted);margin-top:2px;line-height:1.45}
+  .tiprow{padding:11px 16px;font-size:14px;color:var(--ink);line-height:1.5;position:relative;display:flex;gap:10px}
+  .tiprow + .tiprow::before{content:"";position:absolute;left:16px;right:0;top:0;height:1px;background:var(--line)}
+  .tiprow .bullet{color:var(--accent);font-weight:800;flex:none}
+
+  /* Money — action buttons, health ring, donut, insights */
+  .money-actions{display:flex;gap:8px}
+  .mbtn{background:var(--accent);color:#fff;border:0;border-radius:980px;font-family:inherit;font-size:13.5px;font-weight:700;
+    padding:8px 14px;cursor:pointer;letter-spacing:-.01em;white-space:nowrap}
+  .mbtn:active{opacity:.85}
+  .mbtn.ghost{background:var(--surface);color:var(--accent);border:1px solid var(--line)}
+  .bhero{display:flex;align-items:center;gap:16px;background:var(--surface);border-radius:20px;padding:16px 18px;box-shadow:var(--shadow)}
+  .bring{position:relative;flex:none;width:104px;height:104px}
+  .bring svg{width:104px;height:104px;display:block}
+  .bring-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .bring-pct{font-size:21px;font-weight:800;letter-spacing:-.02em}
+  .bring-lab{font-size:9.5px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.05em}
+  .bhero-r{flex:1;min-width:0}
+  .bhero-big{font-size:27px;font-weight:800;letter-spacing:-.02em}
+  .bhero-sub{font-size:13px;color:var(--muted);margin-top:1px}
+  .bhero-safe{font-size:13px;color:var(--muted);margin-top:9px;line-height:1.45}
+  .insights{display:flex;gap:9px;margin:10px 0 0}
+  .istat{flex:1;background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:11px 12px;min-width:0;text-align:center}
+  .istat .v{font-size:16px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .istat .l{font-size:10.5px;color:var(--faint);margin-top:2px;line-height:1.3}
+  .donutbox{display:flex;align-items:center;gap:16px;background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:14px 16px;margin-bottom:10px}
+  .donut{position:relative;flex:none;width:112px;height:112px}
+  .donut svg{width:112px;height:112px;display:block}
+  .donut-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .donut-v{font-size:16px;font-weight:800;letter-spacing:-.02em}
+  .donut-l{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.04em}
+  .dlegs{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+  .dleg{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600}
+  .dleg .ddot{width:10px;height:10px;border-radius:3px;flex:none}
+  .dleg .dval{margin-left:auto;color:var(--muted);font-weight:600}
 </style>
 </head>
 <body>
@@ -201,23 +297,29 @@
 
 <!-- JOURNEY -->
 <section class="tab" id="tab-trains">
-  <div class="kicker">Flights + trains, in order · tap a train when booked</div>
+  <div class="kicker">Your transport, start to finish · tap a leg to update its status</div>
   <h1 class="largetitle">Journey</h1>
-  <div class="group" id="trains"></div>
-  <div class="note" style="padding:14px 4px 0">
-    Trains: book on <b>Trip.com</b> (works without a VPN in China). Tickets release 15 days before travel.
-    <b>Your passport is the ticket</b> — use the staffed manual gate. Arrive 40–50 min early at mega-stations.
+  <div id="trains"></div>
+  <div class="note" style="padding:16px 4px 0">
+    New legs slot in automatically as you book them. Trains: book on <b>Trip.com</b> (no VPN needed in China); tickets release 15 days out. <b>Your passport is the ticket</b> — use the staffed manual gate, arrive 40–50 min early at mega-stations.
   </div>
 </section>
 
 <!-- MONEY -->
 <section class="tab" id="tab-money">
   <div class="kicker">Your solo pot · recomputes live, offline</div>
-  <h1 class="largetitle">Budget</h1>
+  <div class="titlebar"><h1 class="largetitle">Budget</h1>
+    <div class="money-actions">
+      <button class="mbtn" id="addExpBtn" type="button">＋ Expense</button>
+      <button class="mbtn ghost" id="adjBudBtn" type="button">Adjust</button>
+    </div></div>
   <div id="budgetHero"></div>
+  <div id="insights" class="insights"></div>
+  <div id="adjPanel"></div>
   <div class="grouphdr">Forecast to trip's end <span class="progress" id="fcstamp"></span></div>
   <div class="group" id="forecast"></div>
   <div class="grouphdr">Where it goes <span class="progress" id="catprog"></span></div>
+  <div id="catViz"></div>
   <div class="group" id="bycat"></div>
   <div class="grouphdr">Expenses <span class="progress" id="expprog"></span></div>
   <div class="group" id="expenses"></div>
@@ -236,17 +338,15 @@
 
 <!-- PREP -->
 <section class="tab" id="tab-prep">
-  <div class="kicker">Saves as you tick · works offline</div>
+  <div class="kicker">Your trip checklist · saves as you tick</div>
   <div class="titlebar"><h1 class="largetitle">Prep</h1><button class="btn-edit" id="prepEdit" type="button">Edit</button></div>
-  <div class="grouphdr">Before you fly <span class="progress" id="prepprog"></span></div>
-  <div class="group" id="prep-before"></div>
-  <div class="grouphdr">China setup · do before you arrive</div>
-  <div class="group" id="prep-china"></div>
-  <div class="grouphdr">Final 48 hours</div>
-  <div class="group" id="prep-final"></div>
+  <textarea class="cm-note" id="prepNotes" placeholder="Notes & reminders — pin anything here. Saves automatically."></textarea>
+  <div class="grouphdr">Checklist <span class="progress" id="prepprog"></span></div>
+  <div id="prepGroups"></div>
+  <button class="addcat" id="prepAddCat" type="button">＋ Add category</button>
   <div class="savebar">
     <button class="btn-save" id="prepSave" type="button">Save list</button>
-    <div class="savehint" id="prepSaveHint">Edits save on this device as you make them. <b>Save list</b> exports prep-export.json for Claude to fold into the hub.</div>
+    <div class="savehint" id="prepSaveHint">Tap <b>Edit</b> to add, rename or remove tasks and whole categories. Everything saves on this device; <b>Save list</b> exports prep-export.json for Claude to fold in permanently.</div>
   </div>
 </section>
 
@@ -278,6 +378,12 @@
     <p><b>NZ MFAT 24/7 consular:</b> +64 99 20 20 20 · embassies in Beijing, Shanghai, Guangzhou, HK.</p>
   </div>
 </section>
+
+<!-- CITY DETAIL (slides in over everything) -->
+<div id="cityModal" class="citymodal">
+  <div class="cm-bar"><button class="cm-back" id="cmBack">‹ Trip</button></div>
+  <div id="cityBody"></div>
+</div>
 
 <nav class="tabs" id="tabs">
   <button data-tab="today" class="active"><span class="ic">🧭</span>Today</button>
@@ -316,15 +422,16 @@ const TRIP = {
     {nm:"HK Airport",cc:"Dylan solo",in:"2026-07-21",out:"2026-07-22",hotel:"Regala Skycity · onward Jul 22",pay:"paid",img:"_assets/hk-starferry.jpg"},
   ],
 
+  /* status: autobuy (Trip.com pre-order, auto-buys on sale date — counts as booked) | booked (paid) | planned */
   trains:[
-    {id:1,from:"Beijing",to:"Xi'an",departs:"2026-07-01",opens:"2026-06-17",fare:"¥515",dur:"4.5–5 h",st:"北京西 → 西安北"},
-    {id:2,from:"Xi'an",to:"Chongqing",departs:"2026-07-03",opens:"2026-06-19",fare:"¥390",dur:"5–6 h",st:"西安北 → 重庆"},
-    {id:3,from:"Chongqing",to:"Chengdu",departs:"2026-07-06",opens:"2026-06-22",fare:"¥155",dur:"1.5 h",st:"重庆 → 成都东"},
-    {id:4,from:"Zhangjiajie",to:"Furong",departs:"2026-07-11",opens:"2026-06-27",fare:"¥30",dur:"35 min",st:"张家界西 → 芙蓉镇"},
-    {id:5,from:"Furong",to:"Shanghai",departs:"2026-07-12",opens:"2026-06-28",fare:"¥620",dur:"~7 h (transfer 长沙南)",st:"芙蓉镇 → 上海虹桥"},
-    {id:6,from:"Shanghai",to:"Xiamen",departs:"2026-07-15",opens:"2026-07-01",fare:"¥430",dur:"~5 h",st:"上海虹桥 → 厦门北"},
-    {id:7,from:"Xiamen",to:"Shenzhen",departs:"2026-07-16",opens:"2026-07-02",fare:"¥230",dur:"~3 h",st:"厦门北 → 深圳北"},
-    {id:8,from:"Shenzhen",to:"Hong Kong",departs:"2026-07-18",opens:"2026-07-04",fare:"¥75",dur:"~15 min",st:"福田 → 香港西九龙"},
+    {id:1,from:"Beijing",to:"Xi'an",departs:"2026-07-01",opens:"2026-06-17",fare:"¥515",dur:"4.5–5 h",st:"北京西 → 西安北",status:"autobuy"},
+    {id:2,from:"Xi'an",to:"Chongqing",departs:"2026-07-03",opens:"2026-06-19",fare:"¥390",dur:"5–6 h",st:"西安北 → 重庆",status:"autobuy"},
+    {id:3,from:"Chongqing",to:"Chengdu",departs:"2026-07-06",opens:"2026-06-22",fare:"¥155",dur:"1.5 h",st:"重庆 → 成都东",status:"autobuy"},
+    {id:4,from:"Zhangjiajie",to:"Furong",departs:"2026-07-11",opens:"2026-06-27",fare:"¥30",dur:"35 min",st:"张家界西 → 芙蓉镇",status:"autobuy"},
+    {id:5,from:"Furong",to:"Shanghai",departs:"2026-07-12",opens:"2026-06-28",fare:"¥620",dur:"~7 h (transfer 长沙南)",st:"芙蓉镇 → 上海虹桥",status:"autobuy"},
+    {id:6,from:"Shanghai",to:"Xiamen",departs:"2026-07-15",opens:"2026-07-01",fare:"¥430",dur:"~5 h",st:"上海虹桥 → 厦门北",status:"booked"},
+    {id:7,from:"Xiamen",to:"Shenzhen",departs:"2026-07-16",opens:"2026-07-02",fare:"¥230",dur:"~3 h",st:"厦门北 → 深圳北",status:"booked"},
+    {id:8,from:"Shenzhen",to:"Hong Kong",departs:"2026-07-18",opens:"2026-07-04",fare:"¥75",dur:"~15 min",st:"福田 → 香港西九龙",status:"planned"},
   ],
 
   flights:[
@@ -334,6 +441,23 @@ const TRIP = {
     {date:"2026-07-08",from:"Chengdu (TFU)",to:"Zhangjiajie (DYG)",fl:"CA2675",dep:"12:15",fare:"NZD 473 · 2 pax",who:"both",booked:true},
     {date:"2026-07-21",from:"Hong Kong (HKG)",to:"home",fl:"QF128",who:"Zak",booked:true},
     {date:"2026-07-22",from:"Hong Kong (HKG)",to:"onward · SE Asia",fl:"not booked",who:"Dylan solo",booked:false,flag:"BOOK"},
+  ],
+
+  /* Future transport legs (SE Asia flights / buses / ferries). Append as you book:
+     {mode:"flight"|"bus"|"ferry",date,time,from,to,fare,dur,status:"planned"|"booked"|"confirmed",st} */
+  segments:[],
+
+  /* Bookings & activities — powers the city pages, the calendar and the Tokyo line-up.
+     status: confirmed | planned. Confirmation/order numbers live in TRIP_STATE.md, never here. */
+  events:[
+    {date:"2026-06-24",city:"Tokyo",title:"Tokyo Disneyland",venue:"Tokyo Disney Resort · Maihama",status:"planned",cat:"Activities",note:"Treating as confirmed — grab tickets in the Tokyo Disney Resort app."},
+    {date:"2026-06-25",time:"11:30",city:"Tokyo",title:"teamLab Planets",venue:"Shin-Toyosu 新豊洲 (subway, not the bus)",status:"confirmed",cat:"Activities",note:"QR appears after midnight on the day."},
+    {date:"2026-06-26",time:"18:00",city:"Tokyo",title:"Yakult Swallows v Chunichi Dragons",venue:"Meiji Jingu Stadium 明治神宮野球場",status:"confirmed",cat:"Activities",seat:"Visitor outfield reserved C3 · Gate 13 · Row 42 · Seats 306–307",cost:"¥6,260 · 2 tix · paid (Apple Pay)"},
+  ],
+
+  /* Actual spend (co-pilot appends from receipts). Baseball logged below. */
+  spend:[
+    {date:"2026-06-15",city:"Tokyo",cur:"JPY",amt:6260,what:"Swallows baseball (2 tix)",cat:"Activities"},
   ],
 
   deadlines:[ {label:"Beijing Sunworld — cancel or keep",date:"2026-06-25",sev:"high",action:"Cancel free, or pay 1 night (~NZD 170). Decision needed."} ],
@@ -375,8 +499,102 @@ const TRIP = {
     {c:"Malaysia",v:"visa-free 90 days · MDAC ≤3 days"},
   ],
 
+  /* Per-city travel info for the city pages. Co-pilot enriches `attractions`, `tips`, `weather` over time.
+     attractions: {n:name, d:short why}. tips: plain strings. */
+  cityInfo:{
+    "Tokyo":{attractions:[
+      {n:"Sensō-ji & Nakamise",d:"Asakusa's grand temple + market street — 5 min from your hotel."},
+      {n:"teamLab Planets",d:"Booked Thu 25th 11:30 — barefoot digital art, Toyosu."},
+      {n:"Shibuya Sky",d:"Open-air rooftop over the famous crossing — sunset slots sell out."},
+      {n:"Meiji Jingū & Harajuku",d:"Forest shrine next to Tokyo's loudest street fashion."}],
+      tips:["Add a Suica card to Apple Wallet — taps onto every train, bus and konbini.",
+        "Cash from 7-Bank ATMs in any 7-Eleven; many small places are still cash-only.",
+        "Trains stop around midnight — check the last one or you're in a cab."]},
+    "Beijing":{attractions:[
+      {n:"Great Wall · Mutianyu",d:"Less mobbed than Badaling; cable car up, toboggan down."},
+      {n:"Forbidden City",d:"Vast imperial palace — book ahead with your passport, enter at Meridian Gate."},
+      {n:"Temple of Heaven",d:"Locals doing tai chi at dawn in a beautiful park."},
+      {n:"Summer Palace",d:"Lakeside imperial retreat — a cooler half-day escape."}],
+      tips:["Book Forbidden City tickets a few days out (passport = ticket); it sells out.",
+        "DiDi inside Alipay is your taxi; have the address in Chinese ready.",
+        "Your VPN must be installed and tested before you land."]},
+    "Xi'an":{attractions:[
+      {n:"Terracotta Army",d:"8,000 warriors, ~1 hr out of town — go early, Pit 1 first."},
+      {n:"City Wall",d:"Rent a bike and ride the full 14 km loop on top."},
+      {n:"Muslim Quarter",d:"Hectic food street — roujiamo, hand-pulled noodles, lamb skewers."},
+      {n:"Big Wild Goose Pagoda",d:"Tang-era landmark with a nightly fountain show."}],
+      tips:["Terracotta: DiDi or a half-day tour; buy tickets online to skip the queue.",
+        "Eat your way through the Muslim Quarter after dark.",
+        "Xi'an North (西安北) is the HSR station — not the central one."]},
+    "Chongqing":{attractions:[
+      {n:"Hongya Cave",d:"Stilted riverside complex that glows like a film set at night."},
+      {n:"Yangtze Cableway",d:"Cross the river in a cable car over the skyline."},
+      {n:"Ciqikou Old Town",d:"Cobbled lanes, snacks and tea by the water."},
+      {n:"Hotpot",d:"This is where mala hotpot was born — go local, go spicy."}],
+      tips:["July is brutally hot and humid — do outdoor stuff at night.",
+        "It's a vertical, 3D city; map directions and floor numbers get weird.",
+        "Hongya Cave is best seen lit up after sunset."]},
+    "Chengdu":{attractions:[
+      {n:"Giant Panda Base",d:"Go for the 7:30am opening — pandas are active then, asleep by mid-morning."},
+      {n:"Jinli & Kuanzhai Alleys",d:"Restored old streets full of street food and teahouses."},
+      {n:"People's Park",d:"Sit in the Heming teahouse and watch the city slow down."},
+      {n:"Leshan Giant Buddha",d:"World's largest stone Buddha — a doable day trip."}],
+      tips:["Panda Base early or you'll watch them nap — book online.",
+        "Chengdu is the laid-back food capital; pace yourself, eat often.",
+        "Great base for day trips (Leshan, Mt Emei)."]},
+    "Zhangjiajie":{attractions:[
+      {n:"Yuanjiajie / 'Avatar' Mountains",d:"The floating sandstone pillars — Bailong glass elevator up."},
+      {n:"Tianmen Mountain",d:"Cable car, glass skywalk and the cave 'Heaven's Gate'."},
+      {n:"Golden Whip Stream",d:"Easy valley-floor walk between the giant peaks."}],
+      tips:["The park is enormous — pick one big mountain day and commit.",
+        "Cable cars pause in lightning; do the heights on your best-weather morning.",
+        "Buy the multi-day park ticket; keep your passport for entry."]},
+    "Furong Town":{attractions:[
+      {n:"Furong Waterfall Village",d:"A 2,000-year-old Tujia town built right beside a waterfall."},
+      {n:"Riverside stilt houses",d:"Wooden Tujia diaojiaolou hanging over the water."}],
+      tips:["Small, quick stop — gorgeous lit up at night.",
+        "Try Tujia minority dishes; it's touristy but genuinely scenic."]},
+    "Shanghai":{attractions:[
+      {n:"The Bund",d:"Colonial waterfront facing the neon Pudong skyline — go after dark."},
+      {n:"Yu Garden & Old City",d:"Classical Ming garden + the bazaar around it."},
+      {n:"French Concession",d:"Leafy plane-tree streets, cafés and boutiques — best on foot."},
+      {n:"Pudong skyline",d:"Up the Shanghai Tower or Pearl for the view."}],
+      tips:["Bund by night, gardens by day; the metro is world-class.",
+        "Your Atour hotel is right by Nanjing Rd / the Bund.",
+        "Shanghai's your non-refundable stay — make the most of 3 nights."]},
+    "Xiamen":{attractions:[
+      {n:"Gulangyu Island",d:"Car-free UNESCO island of colonial villas — ferry across."},
+      {n:"Nanputuo Temple",d:"Seaside Buddhist temple beneath Wulao peaks."},
+      {n:"Zhongshan Road",d:"Waterfront pedestrian street for snacks and people-watching."}],
+      tips:["Book the Gulangyu ferry ticket online in advance.",
+        "Breezy and coastal — a gentler stop after inland heat.",
+        "It's a quick overnight; don't over-plan."]},
+    "Shenzhen":{attractions:[
+      {n:"OCT-LOFT",d:"Warehouse art district — galleries, coffee, design shops."},
+      {n:"Huaqiangbei",d:"The world's biggest electronics market — go to gawk."},
+      {n:"Lianhua Mountain Park",d:"Easy hill with a skyline view over the CBD."}],
+      tips:["Slick, modern and young; the metro is excellent.",
+        "Futian checkpoint links straight to Hong Kong (your next stop).",
+        "Good place to grab any gadget you forgot."]},
+    "Hong Kong":{attractions:[
+      {n:"Victoria Peak",d:"Tram up for the classic harbour view — go on a clear evening."},
+      {n:"Star Ferry & TST promenade",d:"Cheap iconic crossing + Symphony of Lights at 8pm."},
+      {n:"Temple Street Night Market",d:"Street eats, stalls and old-school neon."},
+      {n:"Dim sum",d:"Tim Ho Wan or a proper cha chaan teng — go all in."}],
+      tips:["Octopus card in Apple Wallet for the MTR, buses, trams and ferries.",
+        "It's typhoon season — watch for T8 signals (they pause transport and flights).",
+        "Your last shared nights with Zak before he flies home Jul 21."]},
+    "HK Airport":{attractions:[
+      {n:"Regala Skycity",d:"Your in-airport hotel for the night of the 21st→22nd."},
+      {n:"Sky Bridge / AsiaWorld-Expo",d:"Walkable airside extras if you've time to kill."}],
+      tips:["Book your onward flight for Jul 22 — and carry printed proof of onward travel.",
+        "Bag drop and lounges are steps from the hotel.",
+        "This is where the solo SE Asia leg begins. 🎒"]},
+  },
+
+  prepRev:1,
   prep:{
-    before:[
+    "Before you fly":[
       "Book travel-health clinic appt (some vaccines need 2–4 weeks)",
       "Apply Vietnam e-Visa · evisa.gov.vn",
       "Passport valid 6+ months, 2+ blank pages",
@@ -386,17 +604,29 @@ const TRIP = {
       "Confirm China train bookings (release 15 days before)",
       "Buy whole-trip travel insurance",
     ],
-    china:[
+    "China setup":[
       "Alipay and/or WeChat Pay set up + card linked",
       "Offline maps (Apple / Organic Maps) downloaded",
       "Google Translate offline Chinese pack + Pleco",
       "Some CNY cash as backup",
     ],
-    final:[
+    "On the road":[
+      "Back up photos weekly (cloud or drive)",
+      "Keep the power bank charged",
+      "Check the next city's weather + book ahead where needed",
+      "Log spending in the Money tab",
+    ],
+    "Each new country (SE Asia)":[
+      "Visa / visa-on-arrival sorted before the border",
+      "Local eSIM or SIM topped up",
+      "Arrival card submitted (TDAC / MDAC / SG) in its window",
+      "Some local cash for the first day",
+      "Onward-ticket proof ready if asked",
+    ],
+    "Final 48 hours (each flight)":[
       "Online check-in + offline boarding passes",
       "Charge all devices + power bank",
       "Split cash: daypack / money belt / trolley",
-      "Submit arrival cards in their windows (TDAC, MDAC, SG)",
       "Weigh the bag — leave room to spare",
     ],
   },
@@ -406,7 +636,7 @@ const TRIP = {
 const LS="travelHQ.v1";
 let store=JSON.parse(localStorage.getItem(LS)||"{}");
 store.trains||={}; store.paid||={}; store.prep||={};
-store.prepAdd||={before:[],china:[],final:[]}; store.prepRem||={};
+store.prepAdd||={}; store.prepRem||={}; store.prepCats||=[]; store.prepNotes||="";
 const save=()=>localStorage.setItem(LS,JSON.stringify(store));
 const booked=id=>!!store.trains[id];
 const paid=city=>!!store.paid[city];
@@ -414,7 +644,7 @@ const ticked=k=>!!store.prep[k];
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 /* prep base revision: when Claude folds exported items into TRIP.prep he bumps TRIP.prepRev,
    which clears the now-duplicate local add/remove deltas on next load (self-healing sync). */
-if((store.prepRev||0)!==(TRIP.prepRev||0)){store.prepAdd={before:[],china:[],final:[]};store.prepRem={};store.prepRev=(TRIP.prepRev||0);save();}
+if((store.prepRev||0)!==(TRIP.prepRev||0)){store.prepAdd={};store.prepRem={};store.prepCats=[];store.prepRev=(TRIP.prepRev||0);save();}
 
 /* ===================== ENGINE (runs every open, free) ===================== */
 const pd=s=>{const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
@@ -434,14 +664,19 @@ function renderHero(){
   else{big="<b>SE Asia</b> leg";where="Locked itinerary done — onward & freestyle";}
   hero.innerHTML=`<div class="big">${big}</div><div class="where">${where}</div>`;
   document.getElementById("copilot").innerHTML=
-    `<div class="lab">◆ Co-pilot</div><p>${TRIP.briefing.text}</p><div class="stamp">briefing · ${fmt(TRIP.briefing.date)}</div>`;
+    `<div class="cop-head"><div class="cop-av">🧭</div>
+       <div class="cop-id"><div class="cop-name">Your Co-pilot</div><div class="cop-sub">Morning briefing · ${fmt(TRIP.briefing.date)}</div></div>
+       <button class="cop-info" id="copInfo" aria-label="What is this?">?</button></div>
+     <p class="cop-msg">${esc(TRIP.briefing.text)}</p>
+     <div class="cop-foot"><span class="pulse"></span>Next briefing ~6am, wherever you wake up</div>
+     <div class="cop-explain" id="copExplain" hidden>I'm your travel co-pilot — a wee AI mate that runs each morning around 6am. I check the weather, your deadlines and your inbox, then leave one focused note right here, and quietly keep your budget, bookings and city pages up to date. Tap anything in the app to mark it done.</div>`;
 }
 
 function renderToday(){
   const act=[],hor=[],here=whereNow();
   if(here)act.push({cls:"now",dot:"var(--accent)",t:`You're in ${here.nm}`,when:"now",
     d:here.pay==="due"?`${here.hotel} — pay at checkout`:`${here.hotel}`});
-  TRIP.trains.forEach(t=>{ if(booked(t.id))return;
+  TRIP.trains.forEach(t=>{ if(trBooked(t))return;
     const o=days(today,t.opens);
     if(o<=0)act.push({cls:"now",dot:"var(--red)",t:`Book Train ${t.id}: ${t.from} → ${t.to}`,when:rel(o)+" · open",
       d:`Departs ${fmt(t.departs)} · ${t.fare} pp · ${t.dur}. Book on Trip.com.`});
@@ -462,45 +697,62 @@ function renderToday(){
 }
 
 function renderCities(){
-  cities.innerHTML=TRIP.cities.map(c=>{
+  cities.innerHTML=TRIP.cities.map((c,i)=>{
     const n=days(pd(c.in),c.out),cur=today>=pd(c.in)&&today<pd(c.out);
     const p=c.pay==="due"&&!paid(c.city);
     const badge=p?`<span class="badge b-orange">${c.payAmt}</span>`:`<span class="badge b-green">paid</span>`;
     const flag=c.flag?`<span class="badge b-red">${c.flag}</span>`:"";
-    return `<div class="city${cur?" current":""}">
+    return `<div class="city tap${cur?" current":""}" data-city="${i}">
       <img loading="lazy" src="${c.img}" alt="" onerror="this.style.display='none'"><div class="grad"></div>
       <div class="tr">${badge}</div>
       <div class="body"><div class="nm">${c.nm}<span class="cc">${c.cc}</span></div>
         <div class="meta">${fmt(c.in)} → ${fmt(c.out)} · ${n} night${n===1?"":"s"} ${flag}</div>
-        <div class="hot">${c.hotel}</div></div></div>`;}).join("");
+        <div class="hot">${c.hotel}</div></div>
+      <div class="city-go">›</div></div>`;}).join("");
   onward.innerHTML=TRIP.onward.map(x=>
     `<div class="row"><div class="main"><div class="t">${x.c}</div><div class="d">${x.v}</div></div></div>`).join("");
 }
 
+/* a train counts as booked if it has a positive manual override, else if its data status isn't "planned"
+   (autobuy + booked both count as booked — Dylan's rule). */
+const trBooked=t=>{const ov=store.trains[t.id];return ov!==undefined?ov:(t.status&&t.status!=="planned");};
+
+/* Unified, date-sorted journey: trains + flights + future segments, each with a status badge. */
+function journeyLegs(){
+  const out=[];
+  TRIP.trains.forEach(t=>{
+    const ov=store.trains[t.id], bk=trBooked(t);
+    let dot,cls,txt;
+    if(bk){dot="green";cls="b-green";txt=(t.status==="autobuy"&&ov===undefined)?"Auto-buy":"Booked";}
+    else{dot="orange";cls="b-orange";txt="Planned";}
+    const auto=(t.status==="autobuy"&&ov===undefined&&days(today,t.opens)>0)?` · auto-buys ${fmt(t.opens)}`:"";
+    out.push({mode:"train",date:t.departs,from:t.from,to:t.to,id:t.id,tap:true,
+      meta:`${fmt(t.departs)} · ${t.fare} pp · ${t.dur}<br>${t.st}${auto}`,dot,cls,txt});
+  });
+  (TRIP.flights||[]).forEach(f=>{
+    const who=f.who&&f.who!=="both"?` · ${f.who}`:"";
+    const b=f.booked;
+    out.push({mode:"flight",date:f.date,from:f.from,to:f.to,
+      meta:`${fmt(f.date)}${f.dep?" · "+f.dep:""} · ${f.fl}${f.fare?" · "+f.fare:""}${who}`,
+      dot:b?"blue":"red",cls:b?"b-green":"b-red",txt:b?"Confirmed":(f.flag?"Book":"Planned")});
+  });
+  (TRIP.segments||[]).forEach(s=>{
+    const planned=!s.status||s.status==="planned";
+    out.push({mode:s.mode||"bus",date:s.date,from:s.from,to:s.to,
+      meta:`${fmt(s.date)}${s.time?" · "+s.time:""}${s.fare?" · "+s.fare:""}${s.dur?" · "+s.dur:""}${s.st?"<br>"+s.st:""}`,
+      dot:planned?"orange":"green",cls:planned?"b-orange":"b-green",txt:planned?"Planned":(s.status==="confirmed"?"Confirmed":"Booked")});
+  });
+  return out.sort((a,b)=>pd(a.date)-pd(b.date));
+}
+const MODEIC={train:"🚄",flight:"✈️",bus:"🚌",ferry:"⛴️"};
 function renderTrains(){
-  const legs=[];
-  TRIP.trains.forEach(t=>legs.push({k:"train",date:t.departs,t}));
-  (TRIP.flights||[]).forEach(f=>legs.push({k:"flight",date:f.date,f}));
-  legs.sort((a,b)=>pd(a.date)-pd(b.date));
-  trains.innerHTML=legs.map(L=>{
-    if(L.k==="train"){
-      const t=L.t,b=booked(t.id),o=days(today,t.opens);
-      const right=b?`<span class="badge b-green">booked</span>`
-        :o<=0?`<span class="badge b-red">book now</span>`:`<span class="badge b-grey">opens ${rel(o)}</span>`;
-      return `<div class="row tap${b?" done":""}" data-train="${t.id}">
-        <div class="chk${b?" on":""}">${tick}</div>
-        <div class="main"><div class="t">🚄 ${t.from} → ${t.to}</div>
-          <div class="d">${fmt(t.departs)} · ${t.fare} pp · ${t.dur} · ${t.st}</div></div>
-        <div class="r">${right}</div></div>`;
-    }
-    const f=L.f, who=f.who&&f.who!=="both"?` · ${f.who}`:"";
-    const right=f.booked?`<span class="badge b-green">booked</span>`:`<span class="badge b-red">${f.flag||"book"}</span>`;
-    return `<div class="row">
-      <div class="chk${f.booked?" on":""}" style="${f.booked?"background:var(--accent);border-color:var(--accent)":""}">${f.booked?tick:""}</div>
-      <div class="main"><div class="t">✈️ ${f.from} → ${f.to}${who}</div>
-        <div class="d">${fmt(f.date)}${f.dep?" · "+f.dep:""} · ${f.fl}${f.fare?" · "+f.fare:""}</div></div>
-      <div class="r">${right}</div></div>`;
-  }).join("");
+  const legs=journeyLegs();
+  document.getElementById("trains").innerHTML=`<div class="timeline">`+legs.map(L=>
+    `<div class="tl-item${L.tap?" tap":""}"${L.tap?` data-train="${L.id}"`:""}>
+       <div class="tl-rail"><div class="tl-dot ${L.dot}">${MODEIC[L.mode]||"📍"}</div><div class="tl-line"></div></div>
+       <div class="tl-card">
+         <div class="tl-top"><div class="tl-route">${esc(L.from)} → ${esc(L.to)}</div><span class="badge ${L.cls}">${L.txt}</span></div>
+         <div class="tl-meta">${L.meta}</div></div></div>`).join("")+`</div>`;
 }
 
 function renderMoney(){
@@ -514,42 +766,53 @@ function renderMoney(){
   document.getElementById("payprog").textContent=`${TRIP.payments.length-left}/${TRIP.payments.length} paid`;
 }
 
-const PG=[{g:"before",k:"b",el:"prep-before"},{g:"china",k:"c",el:"prep-china"},{g:"final",k:"f",el:"prep-final"}];
+/* Prep categories are data-driven: TRIP.prep keys + any custom categories you add (store.prepCats). */
+function prepCats(){const out=Object.keys(TRIP.prep||{});(store.prepCats||[]).forEach(c=>{if(out.indexOf(c)<0)out.push(c);});return out;}
 function renderPrep(){
-  let all=0,done=0;
-  PG.forEach(({g,k,el})=>{
-    const base=TRIP.prep[g].map((txt,i)=>({txt,tk:k+":"+i,rk:g+":"+i,base:1}))
-                           .filter(o=>!store.prepRem[o.rk]);
-    const add=(store.prepAdd[g]||[]).map((txt,i)=>({txt,tk:k+"a:"+i,ai:i}));
+  const host=document.getElementById("prepGroups"); if(!host)return;
+  let all=0,done=0,html="";
+  prepCats().forEach((cat,ci)=>{
+    const base=(TRIP.prep[cat]||[]).map((txt,i)=>({txt,tk:cat+"##b"+i,rk:cat+"##b"+i,base:1})).filter(o=>!store.prepRem[o.rk]);
+    const add=(store.prepAdd[cat]||[]).map((txt,i)=>({txt,tk:cat+"##a"+i,ai:i}));
     const items=base.concat(add);
-    document.getElementById(el).innerHTML=items.map(o=>{
-      const on=ticked(o.tk);
-      const del=o.base?`data-prepdel="${o.rk}"`:`data-prepdela="${g}:${o.ai}"`;
-      return `<div class="row tap${on?" done":""}" data-prep="${o.tk}">
-        <div class="chk${on?" on":""}">${tick}</div>
-        <div class="main"><div class="t">${esc(o.txt)}</div></div>
-        <button class="del" type="button" ${del} aria-label="Remove item">✕</button></div>`;
-    }).join("")
-      +`<div class="addrow"><button class="plus" type="button" data-prepaddbtn="${g}" aria-label="Add item">＋</button>`
-      +`<input type="text" data-prepadd="${g}" placeholder="Add item" enterkeyhint="done" autocomplete="off"></div>`;
+    html+=`<div class="grouphdr">${esc(cat)}</div><div class="group">`
+      +items.map(o=>{const on=ticked(o.tk);
+        const del=o.base?`data-prepdel="${o.rk}"`:`data-prepdela="${ci}##${o.ai}"`;
+        return `<div class="row tap${on?" done":""}" data-prep="${o.tk}" data-cat="${ci}">
+          <div class="chk${on?" on":""}">${tick}</div>
+          <div class="main"><div class="t">${esc(o.txt)}</div></div>
+          <button class="del" type="button" ${del} aria-label="Remove item">✕</button></div>`;}).join("")
+      +`<div class="addrow"><button class="plus" type="button" data-prepaddbtn="${ci}" aria-label="Add item">＋</button>`
+      +`<input type="text" data-prepadd="${ci}" placeholder="Add to ${esc(cat)}" enterkeyhint="done" autocomplete="off"></div></div>`;
     all+=items.length; items.forEach(o=>{if(ticked(o.tk))done++;});
   });
-  document.getElementById("prepprog").textContent=`${done}/${all} done`;
+  host.innerHTML=html;
+  const pp=document.getElementById("prepprog"); if(pp)pp.textContent=`${done}/${all} done`;
 }
 function setPrepEdit(on){
   document.body.classList.toggle("prepedit",on);
   const b=document.getElementById("prepEdit"); if(b)b.textContent=on?"Done":"Edit";
 }
 function prepAddCommit(inp){
-  if(!inp)return; const g=inp.dataset.prepadd,v=inp.value.trim(); if(!v)return;
-  (store.prepAdd[g]||(store.prepAdd[g]=[])).push(v); save(); renderPrep();
-  const ni=document.querySelector(`[data-prepadd="${g}"]`); if(ni)ni.focus();
+  if(!inp)return; const cat=prepCats()[+inp.dataset.prepadd], v=inp.value.trim(); if(!cat||!v)return;
+  (store.prepAdd[cat]||(store.prepAdd[cat]=[])).push(v); save(); renderPrep();
+  const ni=document.querySelector(`[data-prepadd="${inp.dataset.prepadd}"]`); if(ni)ni.focus();
+}
+function prepAddCat(){
+  const name=(prompt("Name the new category")||"").trim(); if(!name)return;
+  if(prepCats().indexOf(name)<0){(store.prepCats||(store.prepCats=[])).push(name);save();renderPrep();}
+}
+function prepRename(tk,cat,ai,isBase,txt){
+  const v=(prompt("Edit task",txt)||"").trim(); if(!v||v===txt)return;
+  if(isBase){store.prepRem[tk]=true;(store.prepAdd[cat]||(store.prepAdd[cat]=[])).push(v);}
+  else if(store.prepAdd[cat]){store.prepAdd[cat][ai]=v;}
+  save();renderPrep();
 }
 function prepSaveList(){
   const prep={};
-  PG.forEach(({g})=>{prep[g]=TRIP.prep[g].filter((_,i)=>!store.prepRem[g+":"+i]).concat(store.prepAdd[g]||[]);});
+  prepCats().forEach(cat=>{prep[cat]=(TRIP.prep[cat]||[]).filter((_,i)=>!store.prepRem[cat+"##b"+i]).concat(store.prepAdd[cat]||[]);});
   const payload={
-    _readme:"Prep list exported from Travel HQ. Claude: set TRIP.prep to `prep` and TRIP.prepRev to `prepRev` in travel-hq.html, then re-sync the public hub. The bumped prepRev clears this device's local edits automatically.",
+    _readme:"Prep list exported from Travel HQ. Claude: set TRIP.prep to `prep` and bump TRIP.prepRev to `prepRev` in travel-hq.html, then re-sync the public hub. The bumped prepRev clears this device's local edits automatically.",
     generated:new Date().toISOString(), prepRev:(TRIP.prepRev||0)+1, prep
   };
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
@@ -563,6 +826,8 @@ function prepSaveList(){
 function renderStatic(){
   document.getElementById("taxi").innerHTML=TRIP.taxi.map(x=>
     `<div class="row"><div class="main"><div class="cn">${x.c} · ${x.cn}</div><div class="addr">${x.a}</div></div></div>`).join("");
+  const pn=document.getElementById("prepNotes");
+  if(pn){pn.value=store.prepNotes||""; pn.addEventListener("input",()=>{store.prepNotes=pn.value;save();});}
   document.getElementById("foot").textContent=
     "Self-contained · offline · saves on this device · recomputes every open · "+today.toLocaleDateString("en-NZ",{day:"numeric",month:"short",year:"numeric"});
 }
@@ -572,12 +837,14 @@ renderStatic();renderAll();
 
 /* ===================== INTERACTIONS ===================== */
 document.body.addEventListener("click",e=>{
+  if(e.target.closest("#copInfo")){const x=document.getElementById("copExplain");if(x)x.hidden=!x.hidden;return;}
   if(e.target.closest("#prepEdit")){setPrepEdit(!document.body.classList.contains("prepedit"));return;}
   if(e.target.closest("#prepSave")){prepSaveList();return;}
+  if(e.target.closest("#prepAddCat")){prepAddCat();return;}
   const del=e.target.closest("[data-prepdel]");
   if(del){store.prepRem[del.dataset.prepdel]=true;save();renderPrep();return;}
   const dela=e.target.closest("[data-prepdela]");
-  if(dela){const[g,i]=dela.dataset.prepdela.split(":");(store.prepAdd[g]||[]).splice(+i,1);save();renderPrep();return;}
+  if(dela){const[ci,i]=dela.dataset.prepdela.split("##");const cat=prepCats()[+ci];if(cat&&store.prepAdd[cat])store.prepAdd[cat].splice(+i,1);save();renderPrep();return;}
   const addb=e.target.closest("[data-prepaddbtn]");
   if(addb){prepAddCommit(addb.parentElement.querySelector("[data-prepadd]"));return;}
   const tr=e.target.closest("[data-train]");
@@ -585,7 +852,14 @@ document.body.addEventListener("click",e=>{
   const pr=e.target.closest("[data-prep]");
   if(tr){const id=tr.dataset.train;store.trains[id]=!store.trains[id];save();renderTrains();renderToday();}
   else if(pay){const c=pay.dataset.pay;store.paid[c]=!store.paid[c];save();renderMoney();renderCities();renderToday();}
-  else if(pr){if(document.body.classList.contains("prepedit"))return;const k=pr.dataset.prep;store.prep[k]=!store.prep[k];save();renderPrep();}
+  else if(pr){
+    if(document.body.classList.contains("prepedit")){
+      const tk=pr.dataset.prep, cat=prepCats()[+pr.dataset.cat], isBase=tk.indexOf("##b")>=0;
+      const ai=isBase?-1:+tk.split("##a")[1], txt=pr.querySelector(".t").textContent;
+      prepRename(tk,cat,ai,isBase,txt); return;
+    }
+    const k=pr.dataset.prep;store.prep[k]=!store.prep[k];save();renderPrep();
+  }
 });
 document.body.addEventListener("keydown",e=>{
   if(e.key==="Enter"){const inp=e.target.closest("[data-prepadd]");if(inp){e.preventDefault();prepAddCommit(inp);}}
@@ -644,7 +918,15 @@ document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",
   const money2=n=>(isFinite(n)?n:0).toLocaleString("en-NZ",{maximumFractionDigits:2});
   const $=id=>document.getElementById(id);
   const inp="font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--surface2);color:var(--ink)";
-  let fx={amt:100,from:"CNY",to:"NZD"}, adding=false;
+  let fx={amt:100,from:"CNY",to:"NZD"}, adding=false, adjusting=false;
+  const CATCOL={Accommodation:"#0a84ff","Food & Drinks":"#ff9500",Transport:"#34c759",Activities:"#ff375f",Shopping:"#bf5af2",Misc:"#8e8e93","Emergency Buffer":"#ff453a"};
+  const ring=(pct,color)=>{const R=50,C=2*Math.PI*R,p=Math.max(0,Math.min(1,pct)),off=C*(1-p);
+    return `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--surface2)" stroke-width="11"/>`
+      +`<circle cx="60" cy="60" r="${R}" fill="none" stroke="${color}" stroke-width="11" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 60 60)"/></svg>`;};
+  const donut=segs=>{const tot=segs.reduce((s,x)=>s+x.val,0)||1,R=50,C=2*Math.PI*R;let acc=0;
+    const arcs=segs.filter(s=>s.val>0).map(s=>{const len=C*(s.val/tot),off=-acc*C;acc+=s.val/tot;
+      return `<circle cx="60" cy="60" r="${R}" fill="none" stroke="${s.color}" stroke-width="14" stroke-dasharray="${len.toFixed(1)} ${(C-len).toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 60 60)"/>`;}).join("");
+    return `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--surface2)" stroke-width="14"/>${arcs}</svg>`;};
 
   const allSpend=()=>[...TRIP.spend,...store.localSpend];
   const spentNZD=()=>allSpend().reduce((s,e)=>s+toNZD(e.amt,e.cur),0);
@@ -652,25 +934,60 @@ document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",
   const forecastDaily=()=>PLAN.stages.reduce((s,x)=>{const v=stageVal(x);return s+v.days*v.daily;},0);
   const committedTotal=()=>PLAN.committed.reduce((s,x)=>s+x.amt,0);
 
-  /* ---- 1. the 5 numbers + verdict ---- */
+  /* ---- 1. health ring + the 5 numbers ---- */
   function renderHero(){
     const pot=G("pot"),emrg=G("emergency"),spent=spentNZD(),comm=committedTotal();
+    const available=Math.max(1,pot-emrg);
     const remaining=pot-spent-comm-emrg;
     const fcast=remaining-forecastDaily();
-    const dleft=Math.max(1,days(today,G("endEst")));
-    const safe=remaining/dleft, ok=fcast>=0;
+    const projOut=spent+comm+forecastDaily();
+    const pct=projOut/available, ok=fcast>=0;
+    const col=ok?"var(--green)":(fcast>-500?"var(--orange)":"var(--red)");
+    const dleft=Math.max(1,days(today,G("endEst"))), safe=remaining/dleft;
     $("budgetHero").innerHTML=
-      `<div class="hero" style="margin-bottom:10px">
-         <div class="big" style="color:${ok?"var(--green)":"var(--red)"}">NZ$ ${money(fcast)}</div>
-         <div class="where">${ok?"projected surplus at trip's end":"projected shortfall — trim days or rates"} · safe ≈ <b>NZ$ ${money(safe)}/day</b> for ${dleft} days</div>
+      `<div class="bhero">
+         <div class="bring">${ring(pct,col)}<div class="bring-c"><div class="bring-pct" style="color:${col}">${Math.round(Math.min(pct,9.99)*100)}%</div><div class="bring-lab">of pot</div></div></div>
+         <div class="bhero-r">
+           <div class="bhero-big" style="color:${col}">NZ$ ${money(fcast)}</div>
+           <div class="bhero-sub">${ok?"projected surplus at trip's end":"projected shortfall — trim days or rates"}</div>
+           <div class="bhero-safe">Safe to spend ≈ <b>NZ$ ${money(safe)}/day</b><br><span style="color:var(--faint)">${dleft} days to ${fmt(G("endEst"))}</span></div>
+         </div>
        </div>
-       <div class="group">
-         <div class="totrow"><span>Pot</span><span class="v" id="potRow" style="cursor:pointer">NZ$ ${money(pot)} ✎</span></div>
+       <div class="group" style="margin-top:10px">
+         <div class="totrow"><span>Pot</span><span class="v">NZ$ ${money(pot)}</span></div>
          <div class="totrow"><span>− Spent so far</span><span class="v">NZ$ ${money(spent)}</span></div>
          <div class="totrow"><span>− Committed · unpaid</span><span class="v">NZ$ ${money(comm)}</span></div>
-         <div class="totrow"><span>− Emergency reserve · protected</span><span class="v" id="emRow" style="cursor:pointer">NZ$ ${money(emrg)} ✎</span></div>
+         <div class="totrow"><span>− Emergency reserve · protected</span><span class="v">NZ$ ${money(emrg)}</span></div>
          <div class="totrow grand"><span>= Remaining to live on</span><span class="v">NZ$ ${money(remaining)}</span></div>
-       </div>`;
+       </div>
+       <div class="note" style="padding:9px 4px 0;font-size:12.5px">Ring = spent + committed + forecast, against your pot (minus the reserve). Tap <b>Adjust</b> to change the pot.</div>`;
+  }
+  /* ---- 1b. insight stat cards ---- */
+  function renderInsights(){
+    const el=$("insights"); if(!el) return;
+    const spent=spentNZD(), items=allSpend().length;
+    const byCat={}; CATS.forEach(k=>byCat[k]=0);
+    allSpend().forEach(e=>{byCat[CATS.includes(e.cat)?e.cat:"Misc"]+=toNZD(e.amt,e.cur);});
+    let topCat="—",topV=0; CATS.forEach(k=>{if(byCat[k]>topV){topV=byCat[k];topCat=k;}});
+    const remaining=G("pot")-spent-committedTotal()-G("emergency");
+    const safe=remaining/Math.max(1,days(today,G("endEst")));
+    const cards=[
+      {v:`NZ$ ${money(spent)}`,l:`spent · ${items} item${items===1?"":"s"}`},
+      {v:topV>0?topCat.replace(" & Drinks",""):"—",l:topV>0?`top · NZ$ ${money(topV)}`:"nothing logged"},
+      {v:`NZ$ ${money(safe)}`,l:"safe / day"},
+    ];
+    el.innerHTML=cards.map(c=>`<div class="istat"><div class="v">${c.v}</div><div class="l">${c.l}</div></div>`).join("");
+  }
+  /* ---- 1c. adjust-budget inline panel ---- */
+  function renderAdjust(){
+    $("adjPanel").innerHTML = adjusting
+      ? `<div class="group" style="margin:10px 0 0"><div class="row" style="gap:10px;flex-wrap:wrap;align-items:center">
+           <span style="font-size:13px;color:var(--muted)">Pot NZ$</span><input id="aPot" type="number" inputmode="decimal" value="${G('pot')}" style="${inp};width:108px">
+           <span style="font-size:13px;color:var(--muted)">Reserve NZ$</span><input id="aEmrg" type="number" inputmode="decimal" value="${G('emergency')}" style="${inp};width:96px">
+           <button id="aSave" style="${inp};background:var(--accent);color:#fff;border:none;font-weight:700;cursor:pointer">Save</button>
+           <button id="aCancel" style="${inp};cursor:pointer">✕</button></div>
+         <div class="note" style="padding:8px 16px 12px">Raise or lower your total pot, or the protected emergency reserve.</div></div>`
+      : "";
   }
 
   /* ---- 2. forecast stages, tap to edit ---- */
@@ -685,15 +1002,21 @@ document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",
     $("fcstamp").textContent=PLAN.stages.reduce((s,x)=>s+stageVal(x).days,0)+" days planned";
   }
 
-  /* ---- 3. by category: logged spend vs target ---- */
+  /* ---- 3. by category: donut + logged spend vs target ---- */
   function renderCats(){
     const byCat={}; CATS.forEach(k=>byCat[k]=0);
     allSpend().forEach(e=>{const c=CATS.includes(e.cat)?e.cat:"Misc";byCat[c]+=toNZD(e.amt,e.cur);});
+    const total=CATS.reduce((s,k)=>s+byCat[k],0);
+    const segs=CATS.map(k=>({k,val:byCat[k]||0,color:CATCOL[k]||"#8e8e93"})).filter(s=>s.val>0).sort((a,b)=>b.val-a.val);
+    const legend=segs.length
+      ? segs.map(s=>`<div class="dleg"><span class="ddot" style="background:${s.color}"></span>${s.k.replace(" & Drinks","")}<span class="dval">NZ$ ${money(s.val)}</span></div>`).join("")
+      : `<div class="note" style="padding:0">Nothing logged yet — add an expense and it'll slice up here.</div>`;
+    $("catViz").innerHTML=`<div class="donutbox"><div class="donut">${donut(segs)}<div class="donut-c"><div class="donut-v">NZ$ ${money(total)}</div><div class="donut-l">spent</div></div></div><div class="dlegs">${legend}</div></div>`;
     $("bycat").innerHTML=PLAN.cats.map(c=>{
       const sp=byCat[c.k]||0,pct=Math.min(100,Math.round(sp/c.t*100)),over=sp>c.t;
       return `<div class="row"><div class="main"><div class="t">${c.k}</div>
         <div style="height:6px;border-radius:6px;background:var(--surface2);margin-top:6px;overflow:hidden">
-          <div style="height:100%;width:${pct}%;background:${over?"var(--red)":"var(--accent)"}"></div></div></div>
+          <div style="height:100%;width:${pct}%;background:${over?"var(--red)":(CATCOL[c.k]||"var(--accent)")}"></div></div></div>
         <div class="r">NZ$ ${money(sp)} <span style="color:var(--faint)">/ ${money(c.t)}</span></div></div>`;}).join("");
     $("catprog").textContent="spent vs target";
   }
@@ -736,7 +1059,7 @@ document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",
   }
   function updFx(){const e=$("fxRes");if(e)e.textContent=sym[fx.to]+" "+money2(conv(fx.amt,fx.from,fx.to));}
 
-  function renderBudget(){renderHero();renderForecast();renderCats();renderExp();}
+  function renderBudget(){renderHero();renderInsights();renderForecast();renderCats();renderExp();}
 
   /* ---- interactions ---- */
   document.body.addEventListener("input",e=>{if(e.target.id==="fxAmt"){fx.amt=parseFloat(e.target.value)||0;updFx();}});
@@ -745,6 +1068,10 @@ document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",
     else if(e.target.id==="fxTo"){fx.to=e.target.value;updFx();}
   });
   document.body.addEventListener("click",e=>{
+    if(e.target.closest("#addExpBtn")){adding=true;renderExp();const ex=$("expenses");if(ex)ex.scrollIntoView({behavior:"smooth",block:"center"});return;}
+    if(e.target.closest("#adjBudBtn")){adjusting=!adjusting;renderAdjust();return;}
+    if(e.target.closest("#aCancel")){adjusting=false;renderAdjust();return;}
+    if(e.target.closest("#aSave")){const p=parseFloat($("aPot").value),m=parseFloat($("aEmrg").value);if(p>0)store.bud.pot=p;if(m>=0)store.bud.emergency=m;save();adjusting=false;renderAdjust();renderBudget();return;}
     if(e.target.closest("#addExp")){adding=true;renderExp();}
     else if(e.target.closest("#eCancel")){adding=false;renderExp();}
     else if(e.target.closest("#eSave")){
@@ -759,7 +1086,7 @@ document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",
       const o=store.bud.stages[s.region]||{};if(d>=0)o.days=d;if(rate>=0)o.daily=rate;store.bud.stages[s.region]=o;save();renderBudget();}}
   });
 
-  renderFx();renderBudget();
+  renderFx();renderBudget();renderAdjust();
 })();
 </script>
 
@@ -770,7 +1097,7 @@ document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",
   const key=dt=>dt.getFullYear()+"-"+dt.getMonth()+"-"+dt.getDate();
   const cityOn=d=>TRIP.cities.find(c=>d>=pd(c.in)&&d<pd(c.out));
   const dow=["S","M","T","W","T","F","S"];
-  const acts=[{date:"2026-06-25",what:"teamLab Planets · 11:30 Tokyo"}];
+  const acts=(TRIP.events||[]).map(e=>({date:e.date,what:(e.time?e.time+" ":"")+e.title+" · "+e.city}));
   function startOfWeek(d){const x=new Date(d);x.setDate(x.getDate()-x.getDay());return x;}
 
   /* event map: date-key -> [{label,color}] */
@@ -840,6 +1167,73 @@ document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",
     else if(d){showDay(d.dataset.cal);document.getElementById("calDetail").scrollIntoView({behavior:"smooth",block:"nearest"});}
   });
   render();
+})();
+</script>
+
+<script>
+/* ===== City pages — tap a city tile for a full travel page. Reuses TRIP/store/save/pd/today/days/fmt/esc/journeyLegs/MODEIC. ===== */
+(function(){
+  store.cityNotes=store.cityNotes||{};
+  const modal=document.getElementById("cityModal"), body=document.getElementById("cityBody");
+  const fxR=()=>(TRIP.fx&&TRIP.fx.rates)||{};
+  const toNZD=(a,c)=>a*((fxR()[c])||0);
+  const money=n=>(isFinite(n)?n:0).toLocaleString("en-NZ",{maximumFractionDigits:0});
+  const addrOf=nm=>{const t=(TRIP.taxi||[]).find(x=>x.c===nm||nm.indexOf(x.c)===0||x.c.indexOf(nm)===0);return t?t.a:"";};
+  const grp=(hdr,inner)=>inner?`<div class="grouphdr">${hdr}</div><div class="group">${inner}</div>`:"";
+
+  function cityHTML(idx){
+    const c=TRIP.cities[idx]; if(!c) return "";
+    const info=(TRIP.cityInfo||{})[c.nm]||{};
+    const n=days(pd(c.in),c.out), cur=today>=pd(c.in)&&today<pd(c.out);
+    let h=`<div class="cm-hero"><img src="${c.img}" alt="" onerror="this.style.display='none'"><div class="grad"></div>
+      <div class="body"><div class="nm">${esc(c.nm)}</div>
+        <div class="meta">${esc(c.cc)} · ${fmt(c.in)} → ${fmt(c.out)} · ${n} night${n===1?"":"s"}${cur?" · you're here now":""}</div></div></div>`;
+    const addr=addrOf(c.nm);
+    const payBadge=c.pay==="due"?`<span class="badge b-orange">${esc(c.payAmt||"due")}</span>`:`<span class="badge b-green">paid</span>`;
+    h+=grp("Where you're staying",
+      `<div class="row"><div class="main"><div class="t">${esc(c.hotel)}</div>${addr?`<div class="d">${esc(addr)}</div>`:""}
+        <div class="d">Check-in ${fmt(c.in)} · out ${fmt(c.out)}</div></div><div class="r">${payBadge}</div></div>`);
+    const key=c.nm.split(" ")[0];
+    const legs=journeyLegs().filter(L=>(L.from&&L.from.indexOf(key)>=0)||(L.to&&L.to.indexOf(key)>=0));
+    if(legs.length) h+=grp("Getting there & away",
+      legs.map(L=>`<div class="row"><div class="main"><div class="t">${MODEIC[L.mode]||"📍"} ${esc(L.from)} → ${esc(L.to)}</div>
+        <div class="d">${L.meta}</div></div><div class="r"><span class="badge ${L.cls}">${L.txt}</span></div></div>`).join(""));
+    const evs=(TRIP.events||[]).filter(e=>e.city===c.nm).sort((a,b)=>pd(a.date)-pd(b.date));
+    if(evs.length) h+=grp("Bookings & reservations",
+      evs.map(e=>{const st=e.status==="confirmed"?`<span class="badge b-green">confirmed</span>`:`<span class="badge b-grey">planned</span>`;
+        return `<div class="row"><div class="main"><div class="t">${esc(e.title)}</div>
+          <div class="d">${fmt(e.date)}${e.time?" · "+e.time:""} · ${esc(e.venue||"")}${e.seat?"<br>"+esc(e.seat):""}${e.cost?" · "+esc(e.cost):""}${e.note?"<br>"+esc(e.note):""}</div></div>
+          <div class="r">${st}</div></div>`;}).join(""));
+    if(info.attractions&&info.attractions.length) h+=grp("Top things to do",
+      info.attractions.map(a=>`<div class="row att"><div class="main"><div class="t">${esc(a.n)}</div><div class="d">${esc(a.d)}</div></div></div>`).join(""));
+    if(info.tips&&info.tips.length) h+=`<div class="grouphdr">Local tips</div><div class="group">`+
+      info.tips.map(t=>`<div class="tiprow"><span class="bullet">•</span><span>${esc(t)}</span></div>`).join("")+`</div>`;
+    h+=grp("Weather",`<div class="note" style="padding:13px 16px">${info.weather?esc(info.weather):"Your co-pilot drops the forecast here each morning while you're on the road."}</div>`);
+    const sp=[...(TRIP.spend||[]),...(store.localSpend||[])].filter(e=>e.city===c.nm);
+    const tot=sp.reduce((s,e)=>s+toNZD(e.amt,e.cur),0);
+    let spInner=sp.map(e=>`<div class="row"><div class="main"><div class="t">${esc(e.what||e.cat||"Spend")}</div><div class="d">${esc(e.cat||"")} · ${e.cur} ${e.amt}</div></div><div class="r">NZ$ ${money(toNZD(e.amt,e.cur))}</div></div>`).join("");
+    spInner+=`<div class="totrow grand"><span>Spent in ${esc(c.nm)}</span><span class="v">NZ$ ${money(tot)}</span></div>`;
+    h+=`<div class="grouphdr">Spending here</div><div class="group">${spInner}</div>`;
+    h+=`<div class="grouphdr">Notes</div>
+      <textarea class="cm-note" id="cmNote" placeholder="Anything to remember about ${esc(c.nm)} — saves automatically.">${esc(store.cityNotes[c.nm]||"")}</textarea>`;
+    return h;
+  }
+
+  function open(idx){
+    body.innerHTML=cityHTML(idx);
+    const note=document.getElementById("cmNote");
+    if(note) note.addEventListener("input",()=>{store.cityNotes[TRIP.cities[idx].nm]=note.value;save();});
+    modal.classList.add("open"); modal.scrollTop=0;
+    try{history.pushState({city:idx},"");}catch(e){}
+  }
+  function close(){modal.classList.remove("open");}
+
+  document.getElementById("cities").addEventListener("click",e=>{
+    const t=e.target.closest("[data-city]"); if(!t) return;
+    open(+t.dataset.city);
+  });
+  document.getElementById("cmBack").addEventListener("click",()=>{try{history.back();}catch(e){close();}});
+  window.addEventListener("popstate",()=>{if(modal.classList.contains("open"))close();});
 })();
 </script>
 </body>
